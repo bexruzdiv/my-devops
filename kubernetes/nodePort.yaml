@@ -1,0 +1,22 @@
+
+# node port
+
+
+
+#kubectl get svc  #list korish uchun
+#kubectl service my-service --url # ip addr olish uchun
+
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-service
+spec:
+  type: NodePort   #LoadBalancer   #qoysa ham boladi
+  ports: 
+    - targetPort: 80
+      port: 80
+      nodePort: 30010
+  selector: 
+    name: my-app-pod  #selectorga labels dagi barcha variablelarni berish kerak

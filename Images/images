@@ -1,0 +1,39 @@
+# imagelarni pull qilish 
+docker pull nginx/ubuntu/mongo
+
+# listni tekshirish
+docker images
+
+# imageni ochirib tashlash
+docker rmi id/name
+
+# container bor bolishiga qaramay qattiy ochirib tashlash
+docker rmi -f id/name
+
+# imageni save qilish yani arxivlash
+docker save nginx > nginx.tar
+
+# uni hajmini tekshirish
+ls -sh nginx.tar
+
+# image ni file dan ochib chiqarish
+docker load -i ubuntu.tar
+
+# image qidirish        
+docker search snake-game
+
+# imagening ozgarishlari tarixi
+docker history image_name
+
+# image build qilish
+docker build -t bexruz .
+
+# imagelarni tag berish
+docker tag bexruz  bexruz:v2
+
+# image push 
+docker push bexruz:v2
+
+
+
+

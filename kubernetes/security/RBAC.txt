@@ -1,0 +1,135 @@
+
+
+<<<<<<<<---------------  Role Based Access Controls  ----------------------->>>>>>>>>>>
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: for-developer
+  namespace: my-namespace 
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "create", "delete", "exec"]
+
+  # shu yerga boshqa turga mansub rules ni ham qoshib bo`ladi
+
+- apiGroups: [""]
+  resources: ["ConfigMap"]
+  verbs: ["create"]
+
+
+
+
+
+<<<<<<<<<<<<<<<<<<---------------------------------------  RoleBinding qilish  ------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-manager-rolebinding
+  namespace: my-namespace # O'zgartiring
+subjects:
+- kind: User
+  name: user-name # O'zgartiring, buni istalgan foydalanuvchi nomi bo'lishi mumkin
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: pod-manager-role # Alohida yaratilgan rolni ishlatamiz
+  apiGroup: rbac.authorization.k8s.io
+
+
+<<<<<<<<---------------------------------------------------    Commandalar            ------------->>>>>>>>>
+kubectl create -f for-developer.yaml
+
+#listni korish
+kubectl ger roles
+
+# bindinglarni listini korish
+kubectl get rolebindings
+
+#malumot olish
+
+kubectl describe role my-role 
+
+# huquqlarni tekshirish
+kubectl auth can-i create deployments
+ output yes or no qaytariladi
+
+# user ning huquqlarini tekshirish
+ kubectl auth can-i create deployments --as dev-user 
+
+# namespacelar uchun tekshirish
+kubectl auth can-i create deployments --as dev-user --namespace my-space
+
+
+
+
+<<<<<<<<<<<<<<<------------------------------------------  Cluster Roles  -------------------------------->>>>>>>>>>>>>>>>>>>
+!!!! cluster role larning oddiy rollardan farqi: oddiy role rules faqat 1 namespace da yoki muayyan pod uchun ishlaydi
+cluster roleda yaratilgan rullar barcha resurslar uchun ishlaydi
+
+
+kubectl api-resources --namespaced=true or false 
+
+## at yaml
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-admin
+rules:
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "create", "delete"]
+
+<<<<<<<<<<<<<<<-------------------------------    ClusterRoleBinding     -------------------------------->>>>>>>>>>
+
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-admin-binding
+subjects:
+- kind: User
+  name: your-username # Foydalanuvchi nomini o'zgartiring
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin # Yukoridagi ClusterRole nomini ishlatamiz
+  apiGroup: rbac.authorization.k8s.io
+
+
+
+<<<<<<<<<<<<----------------------------        storageni boshqarish uchun cluesterrole      --------------------------->>>>>>>>>>>>>>>>>>
+
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: storage-admin
+rules:
+- apiGroups: [""]
+  resources: ["persistentvolumes"]
+  verbs: ["get", "watch", "list", "create", "delete"]
+- apiGroups: ["storage.k8s.io"]
+  resources: ["storageclasses"]
+  verbs: ["get", "watch", "list", "create", "delete"]
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: michelle-storage-admin
+subjects:
+- kind: User
+  name: michelle
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: storage-admin
+  apiGroup: rbac.authorization.k8s.io
+
+
+
+

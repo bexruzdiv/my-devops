@@ -1,0 +1,7 @@
+#voluem yaratish
+docker create volume my-volume
+
+# containerga ulash
+docker run my-volume:/var/lib/mysql mysql 
+
+

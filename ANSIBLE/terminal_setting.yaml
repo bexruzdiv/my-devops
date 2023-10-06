@@ -1,0 +1,56 @@
+---
+- name: Change Shell to Zsh
+  hosts: localhost
+  tasks:
+    - name: Install Zsh
+      become: yes
+      apt:
+        name: zsh
+        state: present
+
+    - name: Change the default shell to Zsh for the ubuntu user
+      become: yes
+      command:
+        cmd: chsh -s /bin/zsh ubuntu  # ubuntu o'rniga foydalanuvchi nomi o'zingizni qo'
+
+    - name: Install Git
+      become: yes
+      apt:
+        name: git
+        state: present
+
+    - name: Install Oh-My-Zsh
+      shell: > 
+        sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+        
+    - name: Install autosuggestions
+      shell: >
+        git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+
+
+    - name: Install zsh-syntax-highlighting
+      shell: >
+        git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+
+
+    - name: Qatorni ~/.zshrc ga qo'shish
+      lineinfile:
+        regexp: '^plugins='
+        path: ~/.zshrc
+        line: 'plugins=(git zsh-autosuggestions zsh-syntax-highlighting )'
+      become: yes
+
+
+    # - name: Replace the plugins line in .zshrc
+    #   become: yes
+    #   replace:
+    #     path: ~/.zshrc
+    #     regexp: '^plugins=\(git\)'
+    #     replace: 'plugins=(git zsh-autosuggestions zsh-syntax-highlighting)'
+        
+    # - name: Create a new .zshrc file with updated plugins
+    #   become: yes
+    #   lineinfile:
+    #     path: ~/.zshrc
+    #     line: 'plugins=(git zsh-autosuggestions zsh-syntax-highlighting )'
+    #     create: yes

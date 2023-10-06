@@ -1,0 +1,9 @@
+
+#avvalo uni bir xil networkga ulash kerak
+docker network create -d bridge for-mongo
+
+#mongo ni yaratib olish
+sudo docker run -d --network for-mongo --name mongo -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=example -p 27017:27017 mongo
+
+#mongo-expressni yaratish 
+sudo  docker run -d --network for-mongo --name mongo-express -e ME_CONFIG_MONGODB_ADMINUSERNAME=root -e ME_CONFIG_MONGODB_ADMINPASSWORD=example -e ME_CONFIG_MONGODB_URL=mongodb://root:example@mongo:27017/ -p 8081:8081 mongo-express

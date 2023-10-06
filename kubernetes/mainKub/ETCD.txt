@@ -1,0 +1,17 @@
+
+# key va value yaratish
+etcdctl set key1 value1  va etcd put key1 valu1 #api3
+
+#key orqali value ni o`qish
+etcdctl get key1
+
+#key orqali listdan ochirib tashlash
+etcdctl rm key1
+
+# api versiyasini 2 dan 3 ga ozgartirish
+export ETCDCTL_API=3
+
+
+
+
+

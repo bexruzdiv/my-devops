@@ -1,0 +1,27 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-shop
+  labels:
+    app: nginx-shop
+spec:
+  containers:
+    - name: nginx-shop
+      image: bexruzdev/shoppingday
+
+  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-shop-service
+spec:
+  selector:
+    app: nginx-shop
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30222
+  type: NodePort

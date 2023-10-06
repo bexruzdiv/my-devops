@@ -1,0 +1,31 @@
+
+
+# avval etcd-controlplane podi run bolayotganini tekshirish kerak
+---- kubectl describe po etcd-controlplane -n kube-system
+
+# snapshot ni ishlatish uchun ETCDCTL_API=3 ga teng qilish kerak
+---- export ETCDCTL_API=3
+
+# etcd poddagi malumotlarni yordamida saqlanadi
+---- etcdctl snapshot save \                            <---- asosiy kommanda 
+--endpoints=127.0.0.1:2379 \
+> --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+> --cert=/etc/kubernetes/pki/etcd/server.crt \
+> --key=/etc/kubernetes/pki/etcd/server.key \
+> /opt/snapshot-pre-boot.db                             <--- saqlash manzili
+
+
+
+
+<<<<-----------restore qilish--------------->>>>>
+
+---- etcdctl snapshot restore --data-dir /var/lib/etcd-my-backupppp /opt/snapshot-pre-boot.db
+# va yuqorida yaratgan /var/lib/etcd-my-backupppp  fileni vim /etc/kubernetes/manifiest/etcd.yaml file ga ozgartirib qoyish kerak
+
+---- vim /etc/kubernetes/manifiest/etcd.yaml
+ - hostPath:
+      path: /var/lib/etcd                   <<<<---------- mana shu malumotni /var/lib/etcd-my-backupppp ga ozgartirish kerak
+      type: DirectoryOrCreate
+    name: etcd-data
+
+

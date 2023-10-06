@@ -1,0 +1,78 @@
+<<<<<<<<<<<<------------------------- podni volume qilish --------------------------->>>>>>>>>>>>
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: myfrontend
+      image: nginx
+      volumeMounts:
+      - mountPath: "/var/www/html"
+        name: mypd
+  volumes:
+    - name: mypd
+      persistentVolumeClaim:
+        claimName: myclaim
+
+
+
+
+<<<<<<<<<<<<--------------------------- persistent volume yaml yaratish ----------------------------->>>>>>>>>>>>>>>
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-log
+spec:
+  persistentVolumeReclaimPolicy: Retain
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 100Mi                  <<<------------- agar pvc talabi javob bera oladigan MB bolsa shu qabul qilinadi 
+  hostPath:
+    path: /pv/log
+
+
+<<<<<<<<<<<< ------------------------------------------ persistent volume Claim yaratish 
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: claim-log-1
+spec:
+  accessModes:
+    - ReadWriteMany                <<<----------- bu doim tepadagi pv bilan bir xil bolishi kerak ulanishi uchun 
+  resources:
+    requests:
+      storage: 50Mi                <<<----------- bu application uchun kerakli joy talabi
+
+
+<<<<<<<<<<<<<<-------------------- pvc ni pods ga bog`lash ---------------------->>>>>>>>>>>>>>
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+    - name: myfrontend
+      image: nginx
+      volumeMounts:
+      - mountPath: "/var/www/html"
+        name: my-pvc
+  volumes:
+  - name: my-pvc 
+    persistentVolumeClaim:
+        claimName: claim-log-1
+
+
+
+<<<<<<<<--------------------- storage Class --------------->>>>>>>>
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: delayed-volume-sc
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer

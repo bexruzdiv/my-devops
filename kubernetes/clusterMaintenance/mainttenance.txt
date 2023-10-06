@@ -1,0 +1,18 @@
+
+
+ ---- kubectl drain node01 --ignore-daemonsets 
+#komandasi o'nizni node01 nomli Kubernetes nodasini yopish va uni 
+#boshqarayotgan podlarni boshqa nodelarga ko'chirish uchun ishlatiladi.
+# --ignore-daemonsets flagi esa bu noda uchun faqat DaemonSet podlarini o'chirmasligini ta'minlaydi.
+
+
+ ---- kubectl uncordon 
+komandasi Kubernetes tizimida belgilangan bir nodani qayta ishga tushirish uchun ishlatiladi. 
+Bu komanda nodani podlarni qo'llash uchun ishga tushiradi.
+
+ ---- kubectl cordon node01 
+ #komandasi node01 ni tijorat qilish rejimiga o'tkazadi.
+ ---- kubectl uncordon node01 
+ #komandasi esa tijorat qilish rejimidan chiqaradi va nodani qo'shish uchun ishga qaytaradi.
+
+ 

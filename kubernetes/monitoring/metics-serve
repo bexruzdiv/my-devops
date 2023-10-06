@@ -1,0 +1,30 @@
+# download va install qilish uchun 
+
+1) sudo kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+2) git clone https://github.com/kubernetes-incubator/metrics-serve
+
+# 2) cd qilib cd kubernetes-metrics-server/
+kubectl create -f .
+
+# nodelarni mnitoring qilish
+kubectl top node
+
+# podlarni monitoring qilish uchun
+kubectl top pods
+
+
+
+---
+
+
+# log larni tekshirish kubernetesda
+sudo kubectl logs -f kodek-pod          # avval run bolib turgan pod nomi 
+
+
+# agar pod da 2 ta container run bolayotgan bolsa uni log qilish uchun container nomidan foydalaniladi
+sudo kubectl logs -f kodek-pod kodek-container1
+                    yoki
+sudo kubectl logs -f kodek-pod kodek-container2
+
+
+                            

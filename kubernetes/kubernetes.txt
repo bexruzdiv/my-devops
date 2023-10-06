@@ -1,0 +1,78 @@
+
+ minikube start
+
+
+                                                     pods
+
+
+# pod yaratish uchun
+kubectl run nginx --image nginx
+
+# podslar royhatini korish
+kubectl get pods
+
+#malumot olish uchun
+kubectl describe nginx
+
+# run YAML file
+kubectl create -f file.yaml
+
+
+                                                    replicaset
+
+
+# replicaset listini korish
+kubectl get replicaset
+
+#replicasetdagi ozgarishlarni yuklash
+kubectl apply -f my-reply.yml
+
+#replicaset delete qilish
+kubectl delete replicaset my-reply.yaml
+
+                                                
+
+                                                  deployment
+#rollout ni record qilib saqlab qoyish
+kubectl create -f my-dep.yaml --record
+
+#terminalda imperactive usulda yaratish 
+kubectl create deploy webapp --image=kodekloud/webapp-color --replicas=3
+
+
+#rollout history korish
+kubectl rollout history deployment/my-rep3  #my-rep3 deployment name
+
+#bitta oldingi versiyadagi rollout deploymentga ozgartirish
+kubectl rollout undo deployment/my-rep3 
+
+
+#podslarni yaratmasdan turib uni ishlashini tekshirib korish
+kubectl run nginx --image=nginx --dry-run=client -o yaml
+kubectl create deployment --image=nginx nginx --dry-run=client -o yaml
+
+#deployment generatsiya qilib yaratish va filega saqlash
+kubectl create deployment --image=nginx nginx --dry-run=client -o yaml > nginx-deployment.yaml
+
+
+                                                                                                #update
+
+kubectl replace -f example.yaml 
+
+# deploymentni codini edit qilish
+kubectl edit deploy my-rep3 --record  #kiriladi tahrirlaysiz va avto yuklanadi
+
+#image versiyasini ozgartirish
+kubectl set image deployment my-rep3 nginx=nginx:1.18-perl --record 
+
+
+                                                                                                        #service yaratish
+
+
+kubectl expose pod redis --port=6379 --name redis-service --dry-run=client -o yaml
+
+kubectl create service clusterip redis --tcp=6379:6379 --dry-run=client -o yaml
+
+kubectl expose pod nginx --type=NodePort --port=80 --name=nginx-service --dry-run=client -o yaml
+
+kubectl create service nodeport nginx --tcp=80:80 --node-port=30080 --dry-run=client -o yaml

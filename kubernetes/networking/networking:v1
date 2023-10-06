@@ -1,0 +1,46 @@
+# komandasi Unix/Linux tizimlarida portlar haqida ma'lumotni ko'rish uchun ishlatiladi. 
+--- netstat -nplt 
+
+#Bu komanda tarmoq interfeyslarini ro'yxatini ko'rsatadi
+--- ip link
+
+# Agar sizga boshqa ma'lumotlar kerak bo'lsa, shu interfeysning xususiyatlarini aniqlash uchun quyidagi komandalarni ham ishlatishingiz mumkin:
+--- ip link show interfeys-nomi
+# misol uchun:
+--- ip link show eth0
+
+# yoki 
+ip addres show wlo1
+
+#  Bu komanda, tarmoq yo'li orqali xabarlar jo'natilishining qanday yo'nalishda bo'lishini va qaysi o'zaro ulanishlar mavjudligini aniqlaydi.
+--- ip route
+
+# yangi tarmoq yaratish
+--- ip link add v-net-0 type bridge
+
+# interfeysini yuqoriga o'tkazib, ya'ni "up" holatiga o'tkazib, faollashtirgan bo'lasiz.
+--- ip link set dev v-net-0 up
+
+# bridge interfeysiga yangi IP manbasini qo'shib qo'yasiz
+--- ip addr add 192.168.15.5/24 dev v-net-0
+
+#  komandasi Linux tizimida "veth" turi (Virtual Ethernet) bo'lgan interfeyslar to'plamini yaratish uchun ishlatiladi
+--- ip link add veth-my type veth peer name veth-my-br
+
+# komandasini ishlatganingizda, "veth-my" nomli Virtual Ethernet (veth) interfeysini "red" nomli network namespacega ("netns") ko'chirishingizni aytadi.
+--- ip link set veth-my  netns red
+
+#  komandasini ishlatganingizda, "red" nomli network namespace ichida "veth-my" nomli Virtual Ethernet (veth) interfeysiga 192.168.15.1 manbasini qo'shib qo'yasiz.
+--- ip -n red addr add 192.168.15.1 dev veth-my
+
+# komandasini ishlatganingizda, "red" nomli network namespace ichida "veth-my" nomli Virtual Ethernet (veth) interfeysini yuqoriga o'tkazib (aktivlashtirib) olishingizni aytadi.
+--- ip -n red link set veth-my up
+
+#  komandasini ishlatganingizda, "veth-my-br" nomli Virtual Ethernet (veth) interfeysini "v-net-0" nomli bridge interfeysiga bog'layapsiz. Bu amal, "veth-my-br" interfeysini "v-net-0" bridge interfeysi ichidagi bir qismini bo'lib qo'yishni amalga oshiradi.
+--- ip link set veth-my-br master v-net-0
+
+# komandasini ishlatganingizda, tarmoqda yangi manba yo'nalishi qo'shib qo'yasiz
+--- ip route add 192.168.1.0/24  via 192.168.15.5
+
+# komandasini ishlatganingizda, tarmoq segmenti 192.168.15.0/24 dan chiquvchi trafikni NAT (Network Address Translation) orqali chop qilish uchun qo'shimcha qoida qo'shasiz
+--- iptables -t nat -A POSTROUTING  -s 192.168.15.0/24 -j  MASQUERADE

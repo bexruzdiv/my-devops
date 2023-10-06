@@ -1,0 +1,5 @@
+
+#agar kommandani davomini bilmasangiz
+apropos nc   #davomi ncdu
+
+  

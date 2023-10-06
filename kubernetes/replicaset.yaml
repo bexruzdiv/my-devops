@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment   # buni Replicaset ga yoki Deployment ga ozgartirsa boladi, vse
+metadata:
+  name: my-rep3
+spec:
+  replicas: 2
+  selector: 
+    matchLabels:
+      app: seem              # bu
+  template:
+    metadata:
+      name: my-rep2
+      labels:
+        app: seem             # va bu bir xil bolishi kere
+    spec:
+      containers:
+        - name: nginxx
+          image: nginx

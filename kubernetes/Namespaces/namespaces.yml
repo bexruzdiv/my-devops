@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: my-namespace
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+  namespace: my-namespace
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-container
+        image: nginx:latest
+
+
+
+#yoki terminalda namespace yaratish 
+#kubectl create namespace my-space 
+
+#kubectl get pods --namespace=my-space
+
+#kubectl get pods --all-namespaces
+
+
+
+
+
+
+
+

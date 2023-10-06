@@ -1,0 +1,27 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-work
+  labels:
+    app: nginx-work
+spec:
+  containers:
+    - name: nginx-work
+      image: bexruzdev/workingdays
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-work-service
+spec:
+  selector:
+    app: nginx-work
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30333
+  type: NodePort

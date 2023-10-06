@@ -1,0 +1,58 @@
+
+
+# config map yaratish
+kubectl create configmap
+sudo kubectl create configmap app-config --from-literal=APP_COLOR=blue
+
+
+# confimap lar listini tekshirish
+sudo kubectl get configmap
+
+NAME               DATA   AGE
+kube-root-ca.crt   1      9d
+app-config         1      33s
+
+
+# TEKSHIRISH
+sudo kubectl describe configmap app-config
+
+Name:         app-config
+Data
+====
+APP_COLOR:
+----
+blue
+
+# YOKI YAML  FILE KORINISHIDA YARATISH 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: name-config
+data:
+    APP_COLOR: blue
+    APP_MODE: prod
+
+# va uni ishga tushirish uchun
+
+kubectl create -f config-map.yaml
+
+                                                    # configMap ni ishlatish
+pod.yaml
+
+containers:
+    - name: my-con
+      image: my-image
+      envFrom:
+        - configMapRef:
+            name: name-config
+
+# bu configmap ni ichidagi barcha key va valuelarni joylashtiradi
+
+# agar bizga single Env kerak bolsa
+env:
+    - name: APP_COLOR
+      valueFrom:
+        configMapKeyRef:
+            name: name-config
+            key: APP_COLOR
+            

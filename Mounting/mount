@@ -1,0 +1,3 @@
+
+#nginx containerini /home/bexruz/test directoriyasiga ulash 
+docker run -d -p 8080:80 -v /home/bexruz/test:/usr/share/nginx/html nginx

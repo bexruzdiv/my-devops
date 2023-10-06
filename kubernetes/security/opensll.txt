@@ -1,0 +1,21 @@
+
+#key generatsiya qilish
+--- openssl genrsa -out ca.key 2048
+
+#cersificate generatsiya qilish
+--- openssl req -new -key ca.key -subj "/CN=KUBERNETES-CA" -out ca.csr 
+
+# tasdiqlash uchun
+--- openssl x509 -req -in ca.csr -signkey ca.key -out ca.crt 
+
+
+<<<------------admin user------------->>>
+
+#admin key generatsiya
+--- openssl genrsa -out admin.key 2048
+
+# admin cersificate generatsiya qilish
+--- openssl req -new -key admin.key -subj "/CN=kube-admin" -out admin.csr
+
+# tasdiqlash va sertificat olish uchun
+--- openssl x509 -req -in admin.csr -CA ca.key -CAkey ca.key -out admin.crt 

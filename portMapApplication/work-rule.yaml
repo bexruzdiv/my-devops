@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-work-ingress
+spec:
+  rules:
+    - host: work.bexruzdev.uz
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: nginx-work-service
+              port:
+                number: 80
