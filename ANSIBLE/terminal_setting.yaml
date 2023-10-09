@@ -36,7 +36,7 @@
     - name: Qatorni ~/.zshrc ga qo'shish
       lineinfile:
         regexp: '^plugins='
-        path: ~/.zshrc
+        path: /home/ubuntu/.zshrc
         line: 'plugins=(git zsh-autosuggestions zsh-syntax-highlighting )'
       become: yes
 

@@ -1,0 +1,44 @@
+<<<<<<<<--------- weav net ni install qilish------------------>>>>>>>
+kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
+yoki
+curl -L https://github.com/weaveworks/weave/releases/download/latest_release/weave-daemonset-k8s-1.11.yaml | kubectl apply -f -
+
+
+#### documentatsiyasi
+https://kubernetes.io/docs/concepts/cluster-administration/addons/#networking-and-network-policy
+
+<<<<<----------- FLANNEL install --------->>>>>
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/2140ac876ef134e0ed5af15c65e414cf26827915/Documentation/kube-flannel.yml
+
+<<<<----------- Calico install  ----------->>>>
+curl https://docs.projectcalico.org/manifests/calico.yaml -O
+keyin
+kubectl apply -f calico.yaml kommandasi ishga tushirish uchun 
+
+    kubernetes cluster.local in-addr.arpa ip6.arpa {
+       podalar xavfsiz emas
+       in-addr.arpa ip6.arpa orqali
+       ttl 30
+    }
+
+kubectl -n kube-system get deployment coredns -o yaml | \
+  sed 's/allowPrivilegeEscalation: false/allowPrivilegeEskalatsiya: true/g' | \
+  kubectl amal -f -
+
+
+kubectl describe ds kube-proxy -n kube-system
+
+    Buyruq:
+      /usr/local/bin/kube-proxy
+      --config=/var/lib/kube-proxy/config.conf
+      --hostname-override=$(NODE_NAME)
+
+
+      Nosozliklarni tuzatish xizmati bilan bog'liq muammolar:
+
+https://kubernetes.io/docs/tasks/debug-application-cluster/debug-service/
+
+DNS bilan bog'liq muammolarni bartaraf etish:
+
+https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/
+

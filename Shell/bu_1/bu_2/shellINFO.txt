@@ -1,0 +1,71 @@
+ 
+
+### argument veriable foydalanish
+
+echo $0 >> my-text.yaml
+command:  bash my-script   that-my-text
+
+### input kiritish
+read -p "Enter your name:" real-name
+echo $real-name >> my-name.yaml
+
+### IF ni ishlatish
+if [$1="bexrux"]
+then
+    echo "salom bexruz"
+elif [$1="ali"]
+then
+    echo "salom Ali"
+else
+    echo "just hello nobody"
+fi 
+
+
+### FOR loop
+for mission in yupiter jupiter mars earth moon sun galaxy 
+do
+    echo $mission
+done 
+ agar file da bo`lsa 
+ 
+example: list.txt :
+moon
+jupiter
+yupiter
+sun
+earth
+
+for mission in `cat list.txt`
+do
+    echo $mission
+done 
+
+
+### while loop
+
+while [$0 != "bexruz" ]
+do 
+    sleep 
+
+
+
+### case yani chooice
+#!/bin/bash
+while true
+do
+    echo "1. Shutdown"
+    echo "2. restart"
+    echo "3. exit"
+    read -p "Enter your chooice: " choise
+
+case $chooice in 
+    1) shutdown now
+    ;;
+    2) shutdown now -r 
+    ;;
+    3)break 
+    ;;
+    *) continue
+    ;;
+esac 
+done 

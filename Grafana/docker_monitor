@@ -1,0 +1,17 @@
+
+
+docker uchun alohida prometheus,yml file ochish kerak 
+sudo touch /home/bexruz/prometheus.yml
+<<<<---- prometheus docker ---->>>>
+docker run -d /home/bexruz/prometheus.yml:/etc/prometheus/prometheus.yml -p 9090:9090 bexruzdev/my-image
+
+
+
+vim /etc/docker/daemon.json
+{
+  "metrics-addr" : "127.0.0.1:9323",
+  "experimental" : true
+}
+sudo systemctl restart docker 
+
+curl local
