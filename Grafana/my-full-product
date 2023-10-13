@@ -1,0 +1,71 @@
+
+!!!! avval docker-compose up qilinadi
+
+<<<<-----------  alertmanager.yml  --------------->>>>>
+
+global:
+  resolve_timeout: 10s
+receivers:
+- name: default-telegram
+  telegram_configs:
+  - api_url: https://api.telegram.org
+    bot_token: 6129627650:AAEMizExAzPkDitYQH394KXnfPC5YPOvEJ4
+    chat_id: 5518529662
+    disable_notifications: false
+    http_config:
+      follow_redirects: true
+    send_resolved: true
+    parse_mode: ""
+route:
+  continue: false
+  group_by:
+  - job
+  group_interval: 30s
+  group_wait: 30s
+  receiver: default-telegram
+  repeat_interval: 4h
+  routes:
+  - receiver: default-telegram
+templates:
+- /etc/alertmanager/config/*.tmpl
+
+
+
+<<<<-----------  rules.yml  ----------------->>>>>
+
+groups:
+- name: example
+  interval: 15s
+  rules:
+  # Alert for any cluster that has average CPU idle < 30%
+  - alert: HostHighCpuLoad
+    expr: (sum by (instance) (avg by (mode, instance) (irate(node_cpu_seconds_total{mode!="idle"}[2m]))) > 0.4) * on(instance) group_left (nodename) node_uname_info{nodename=~".+"}
+    for: 10s
+    labels:
+      severity: warning
+    annotations:
+      summary: Host high CPU load (instance {{ $labels.instance }})
+      description: "CPU load is > 40%\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+  - alert: HostOutOfMemory
+    expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 45) * on(instance) group_left (nodename) node_uname_info{nodename=~".+"}
+    for: 10s
+    labels:
+      severity: warning
+    annotations:
+      summary: Host out of memory (instance {{ $labels.instance }})
+      description: "Node memory is filling up (< 45% left)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+  - alert: RabbitmqMemoryHigh
+    expr: rabbitmq_process_resident_memory_bytes / rabbitmq_resident_memory_limit_bytes * 100 > 55
+    for: 10s
+    labels:
+      severity: warning
+    annotations:
+      summary: Rabbitmq memory high (instance {{ $labels.instance }})
+      description: "A node use more than 55% of allocated RAM\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+
+
+
+<<<<-----------  prometheus.yml  -------------->>>>
+

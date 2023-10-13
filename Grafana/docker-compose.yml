@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - /home/ubuntu/prometheus/:/etc/prometheus/
+    networks:
+      - my-network
+
+  node_exporter:
+    image: prom/node-exporter
+    container_name: node_exporter
+    restart: always
+    depends_on:
+      - prometheus
+    ports:
+      - "9100:9100"
+    networks:
+      - my-network
+
+  alertmanager:
+    restart: always
+    depends_on:
+      - prometheus
+    image: prom/alertmanager
+    container_name: alertmanager
+    volumes:
+      - /home/ubuntu/alerting/:/etc/alertmanager/
+    expose:
+      - "9093"
+    ports:
+      - 9093:9093
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    name: my-network
+    driver: bridge

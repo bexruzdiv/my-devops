@@ -25,7 +25,7 @@ sudo chown -R prometheus:prometheus /etc/prometheus/consoles
 sudo chown -R prometheus:prometheus /etc/prometheus/console_libraries
 sudo chown -R prometheus:prometheus /var/lib/prometheus
 
-sudo nano /etc/systemd/system/prometheus.service
+sudo vim /etc/systemd/system/prometheus.service
 
 [Unit]
 Description=Prometheus
@@ -113,7 +113,7 @@ http://server_ip:9100/metrics
 faqat prometheus  node-exporter larga ulana oladi buni bir fileda belgilaydi
 
 bu filega path:
-/etc/prometheus/prometheus.yml 
+sudo vim /etc/prometheus/prometheus.yml 
 
 global:
   scrape_interval: 15s
@@ -137,7 +137,7 @@ scrape_configs:
 
 agarda ozgartirish kiritilsa service restart qilish kerak
 
-sudo systemctl restart prometheus 
+sudo systemctl restart prometheus  
 
 
 <<<<--------------- Authentication/Encryption ---------------->>>>>>>>>>>

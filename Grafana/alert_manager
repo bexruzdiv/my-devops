@@ -1,0 +1,89 @@
+<<<<----------------- alert manager install >>>>>
+
+wget https://github.com/prometheus/alertmanager/releases/download/v0.21.0/alertmanager-0.21.0.linux-amd64.tar.gz
+tar xzf alertmanager-0.21.0.linux-amd64.tar.gz
+
+groupadd -f alertmanager
+useradd -g alertmanager --no-create-home --shell /bin/false alertmanager
+mkdir -p /etc/alertmanager/templates
+mkdir /var/lib/alertmanager
+chown alertmanager:alertmanager /etc/alertmanager
+chown alertmanager:alertmanager /var/lib/alertmanager
+mv alertmanager-0.21.0.linux-amd64 alertmanager-files
+cp alertmanager-files/alertmanager /usr/bin/
+cp alertmanager-files/amtool /usr/bin/
+chown alertmanager:alertmanager /usr/bin/alertmanager
+chown alertmanager:alertmanager /usr/bin/amtool
+cp alertmanager-files/alertmanager.yml /etc/alertmanager/alertmanager.yml
+chown alertmanager:alertmanager /etc/alertmanager/alertmanager.yml
+vi /usr/lib/systemd/system/alertmanager.service
+[Unit]
+Description=AlertManager
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=alertmanager
+Group=alertmanager
+Type=simple
+ExecStart=/usr/bin/alertmanager \
+    --config.file /etc/alertmanager/alertmanager.yml \
+    --storage.path /var/lib/alertmanager/
+
+[Install]
+WantedBy=multi-user.target
+
+
+chmod 664 /usr/lib/systemd/system/alertmanager.service
+systemctl daemon-reload
+systemctl start alertmanager
+systemctl status alertmanager
+
+
+vi /etc/prometheus/prometheus.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+           - localhost:9093
+
+systemctl restart prometheus
+
+
+
+
+
+<<<<------------------- alert yaratish ------------------>>>>
+
+vi /etc/prometheus/rules.yaml
+
+groups:
+  - name: node    <<<<<<------------------- group name node
+    rules:
+      - alert: LowDiskSpace   <<<< -------------------------- LowDistSpace is name of alert
+        expr: 100 * node_filesystem_free_bytes{job="nodes"} / node_filesystem_size_bytes{job="nodes"} < 10   <<<<<------- agar free space 10% dan kam qolsa
+        labels:
+          severity: warning
+          environment: prod
+
+vi /etc/prometheus/prometheus.yml
+
+rule_files:
+  - "/etc/prometheus/rules.yaml"
+
+
+systemctl restart prometheus
+
+
+
+
+
+
+name: NodeDown
+expr: up{job="nodes"} == 0
+for: 10s
+labels:
+severity: critical
+annotations:
+message: node {{.Labels.instance}} is down
