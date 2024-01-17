@@ -45,7 +45,6 @@
               errorfile 503 /etc/haproxy/errors/503.http
               errorfile 504 /etc/haproxy/errors/504.http
 
-      # configuration for master nodes.
       listen kubernetes-apiserver-https
               bind *:6443
               mode tcp
@@ -55,22 +54,26 @@
               server master-1 10.0.1.5:6443 check fall 3 rise 2
               balance roundrobin
 
-      # configuration for 1 worker node.
-      frontend https_frontend
-              mode http
+      frontend http_frontend
+              mode tcp
               option tcplog
               bind *:80
-              #bind *:443 ssl crt /etc/ssl/PATH/DOMAIN.pem
-              # http-request redirect scheme https unless { ssl_fc }
-              # http-request set-header X-Forwarded-Port %[dst_port]
-              # http-request add-header X-Forwarded-Proto https if { ssl_fc }
               default_backend http_backend
-
       backend http_backend
-              mode http
-              option forwardfor
+              mode tcp
               balance roundrobin
               server worker-1 10.0.1.4:80 check port 80
+      frontend https_frontend
+              mode tcp
+              option tcplog
+              bind *:443
+              default_backend https_backend
+
+      backend https_backend
+              mode tcp
+              balance roundrobin
+              server worker-1 10.0.0.4:80 check port 80
+
     dest: /etc/haproxy/haproxy.cfg
   notify: Restart HAProxy
 
