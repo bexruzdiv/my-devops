@@ -1,4 +1,0 @@
-
-
-### prometheus.yml file tekshirish
-promtool check config /etc/prometheus/prometheus.yml 

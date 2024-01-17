@@ -1,0 +1,11 @@
+### chart yaratish
+helm create my-chart
+helm install my-release ./my-chart
+
+### Helm chartlarni sinovdan o'tkazish uchun
+helm lint
+### or
+helm template my-release
+
+
+

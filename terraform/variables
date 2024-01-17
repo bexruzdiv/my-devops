@@ -1,0 +1,47 @@
+
+<<<<------------ variables ---------->>>>
+
+variable "filename" {
+    default = "/root/pets.txt"
+}
+variable "content" {
+    default = " it is good content"
+}
+variable "prefix" {
+    default = "Mrs"
+}
+variable "separator" {
+    default = "."
+}
+variable "lenght" {
+    default = "1"
+}
+
+
+
+<<<< ------------- in code -------------->>>>
+
+resource "local_file" "pets" {
+    filename = var.filename
+    content = var.content
+}
+resource "random_pet" "my-pet" {
+    prefix = var.prefix
+    separator = var.separator
+    lenght = var.lenght
+}
+
+
+
+<<<<--------- Understanding the Variable Block ----------------->>>>>>>
+
+variable "filename" {
+    default = "/root/pets.txt"
+    type = string
+    description = "the path of local file"
+}
+variable "content" {
+    default = " it is good content"
+    type = string
+    description = "the content of the file"
+}

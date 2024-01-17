@@ -1,0 +1,15 @@
+<<<<<-------------- Prometheus uchun rule  yozish ------------------>>>>>>>>>>
+
+/etc/prometheus/prometheus.yml file da ozimizning rule file ni path beramiz
+
+rule_files:
+  - /path-to-rule.yml
+
+
+
+rule.yml
+groups:
+  - name: example
+    rules:
+    - record: code:prometheus_http_requests_total:sum
+      expr: sum by (code) (prometheus_http_requests_total)

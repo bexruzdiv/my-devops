@@ -1,0 +1,187 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+      - name: mongo
+        image: mongo
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: root
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          value: example
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - name: mongo-data
+          mountPath: /data/db
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+spec:
+  selector:
+    app: mongo
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-express-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-express
+  template:
+    metadata:
+      labels:
+        app: mongo-express
+    spec:
+      containers:
+      - name: mongo-express
+        image: mongo-express
+        env:
+        - name: ME_CONFIG_MONGODB_ADMINUSERNAME
+          value: root
+        - name: ME_CONFIG_MONGODB_ADMINPASSWORD
+          value: example
+        - name: ME_CONFIG_MONGODB_URL
+          value: "mongodb://root:example@mongo-service:27017/"
+        ports:
+        - containerPort: 8081
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-express-service
+spec:
+  selector:
+    app: mongo-express
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081
+      nodePort: 30122
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-front-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-front
+  template:
+    metadata:
+      labels:
+        app: api-front
+    spec:
+      containers:
+      - name: api-front
+        image: bexruzdev/bot_api_front:4
+        ports:
+        - containerPort: 5000
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-front-service
+spec:
+  selector:
+    app: api-front
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+      nodePort: 30111
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bot-user-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bot-user
+  template:
+    metadata:
+      labels:
+        app: bot-user
+    spec:
+      containers:
+      - name: bot-user
+        image: bexruzdev/bot_user:7
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bot-user-service
+spec:
+  selector:
+    app: bot-user
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bot-frontend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bot-frontend
+  template:
+    metadata:
+      labels:
+        app: bot-frontend
+    spec:
+      containers:
+      - name: bot-frontend
+        image: bexruzdev/bot_frontend:3
+        ports:
+        - containerPort: 80
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bot-frontend-service
+spec:
+  selector:
+    app: bot-frontend
+  ports:
+
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30222

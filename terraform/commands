@@ -1,0 +1,40 @@
+<<<---------- commands ----------->>>
+
+# apply qilmasdan oldin tekshirish
+---- terraform validate
+#Success! The configuration is valid.
+
+# asosiy apply qilinadigan file ni topish
+---- terraform fmt
+#terraform.tf
+
+# hozir holatlarni korish uchun
+---- terraform show
+
+# yoki json formatda korish
+
+---- terraform show -json
+
+
+# qanday providerlardan foydalanayotganini korish
+--- terraform providers
+
+# output variable ni tekshirish
+---- terraform output
+
+# restart qilish 
+---- terraform refresh
+#Refreshing state... [id=373febf6b1735de54cc9e845eaa3bdedf40975b4]
+
+--- terraform graph
+
+# graph ni install qilish
+apt update
+apt install graphviz -y 
+terraform graph | dot -Tsvg > graph.svg
+
+
+
+
+
+

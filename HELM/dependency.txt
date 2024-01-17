@@ -1,0 +1,28 @@
+###############################################################################################################################################################
+helm_dependency Helm chart faylini tarkibiy qismini bildirish uchun ishlatiladi. Bu tarkibiy qismada boshqa Helm chartlariga qarashliq qiladigan kerakli 
+ma'lumotlar va manbalarni o'z ichiga oladi.
+
+Bu funksiya, bir Helm chartdan boshqa Helm chartga bog'liq bo'lgan bog'liqliklarni belgilash uchun ishlatiladi. Bunday bog'liqliklar orqali chartlarning 
+qanday o'rnatilishi va ularga qanday o'zgartirishlar kiritilishi kerakligini aytadi.
+###############################################################################################################################################################
+
+
+
+<<<--- foydalanish --->>>
+# Chart.yaml fayli
+dependencies:
+  - name: mysql
+    version: "8.8.8"
+    repository: "https://example.com/charts"
+  - name: redis
+    version: "10.0.1"
+    repository: "https://anotherrepo.com/charts"
+
+
+################
+yuklab olish
+################
+
+helm dependency update
+
+

@@ -1,0 +1,122 @@
+
+<<<<<<<<<<<<<<<<<<<-------------------   CHART yaratish ---------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>
+#bu papka va uni ichida kerakli bo`lgan filelardan yaratadi`
+helm create my-chart
+# yaratgan file  aorqali chart yaratish
+helm install my-chart /my-chart --dry-run
+
+
+helm show values ./my-chart
+
+### shunday qilsak bizga default nginx va versiya uchun malum bir default versiyadan foydalanadi 
+###ammo biz ozimizga boshqa versiyadagi image kerak bo`lsa  uni kommanda orqali ozgartiramiz
+helm install my-chart /my-chart --set image.tag=latest --dry-run 
+
+
+### file ochamiz va uning image tag inin belgilaymiz
+examle_values.yml
+image:
+    tag: latest
+
+### va buni chart yaratish vaqtida korsatishimiz kerak
+helm install my-chart /my-chart -f example_values.yml --dry-run
+# va imagening tag:   nginx:latest
+
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm install test bitnami/wordpress
+
+
+
+
+
+
+
+
+
+
+
+####nimagadir
+
+mkdir ghost
+touch Chart.yml
+vim values.yaml
+    service:
+        name: blog
+        type: NodePort
+        app: blog
+        protocol: TCP
+        tagetPort: 2368
+        port: 80
+
+mkdir ghost/templates
+vi ghost/templates/service.yml
+#########################################################service yaml
+apiVersion: v1
+kind: Service
+metadata:
+    name: {{ .Values.service.name }}
+spec:
+    type: {{ .Values.service.type }}
+    selector:
+        app: {{ .Values.service.app }}
+    ports:
+    - protocol: {{ .Values.service.protocol }}
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+
+
+#####  Chart uchun
+vi ghost/Charts.yaml
+name: ghost
+version: 1
+
+
+
+vi ghost/templates/ghost.yml
+#################################################### deployment yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.blog.name }}1
+  labels:
+    app: {{ .Values.blog.label }}
+spec:
+  replicas: {{ .Values.blog.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.blog.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.blog.name }}
+    spec:
+      containers:
+        - name: {{ .Values.blog.name }}
+          image: {{ .Values.blog.image }}
+          imagePullPolicy: {{ .Values.blog.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.blog.containerPort }}
+          env:
+            - name: {{ .Values.blog.url }}
+              value: {{ .Values.blog.urlValue }}
+
+
+
+#### VALUE LAR
+blog:
+  name: blog
+  label: blog
+  replicas: 1
+  image: ghost:2.6-alpine
+  imagePullPolicy: Always
+  containerPort: 2368
+  url: url
+  urlValue: http://my-blog-url.com
+
+
+### kiritilgan values larni tekshirish
+helm show values ghost
+
+helm install demo ghost --dry-run
+helm install demo ghost
+

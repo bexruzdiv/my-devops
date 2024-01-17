@@ -1,0 +1,40 @@
+# git install
+sudo apt install git
+
+sudo git clone https://github.com/techiescamp/kubeadm-scripts.git
+
+!!!! eth0 ni ozgartiramiz joriy ip ga
+
+### swap ni off qilamiz
+free
+swapon
+sudo swapoff /swap.img 
+
+### for all
+sudo ./common.sh
+
+# for master
+! agar publik bolsa true. localhostda bolsa false
+! eth0 ozgartirilsin joriy ip ga
+
+sudo ./master.sh
+
+# token olish uchun
+sudo kubeadm token create --print-join-command
+
+# va worker node ga tashaladi qaytgan kode
+
+
+
+
+# metrics server apply
+sudo kubectl apply -f kubeadm-scripts/manifests/metrics-server.yaml
+
+sudo kubectl top nodes
+
+
+# agar master nodeni terminal ga kochirmoqchi bolsak
+/etc/kubernetes/admin.conf ichidagi malumotni localhostdan ~./kube/config ga kochiriladi
+
+
+

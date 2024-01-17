@@ -1,0 +1,115 @@
+<<<----------------  aws instal some packs  ----------------->>>
+
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.0.30.zip" -o "awscliv2.zip"
+sudo apt install unzip
+unzip awscliv2.zip
+sudo ./aws/install
+aws --version
+
+<<<<--------- use aws  --------- >>>>>>
+aws configure
+# va aws orqali user yaratiladi va unga acsess key yaratiladi va malumotlar kiritiladi
+
+aws ec2 describe-instances --filters Name=instance-state-name,Values=running --query 'Reservations[*].Instances[*].{IP:PublicIpAddress, Tags:Tags}' --output json
+
+
+## user yaratish kommandasi
+aws iam create-user --user-name mary
+
+# AdministratorAcsess huquqini berish
+aws --endpoint http://aws:4566 iam attach-user-policy --user-name mary --policy-arn arn:aws:iam::aws:policy/AdministratorAccess
+
+#create group 
+aws --endpoint http://aws:4566 iam create-group --group-name project-sapphire-developers
+
+# user ni group ga qoshish
+aws --endpoint http://aws:4566 iam add-user-to-group --user-name jack --group-name project-sapphire-developers 
+
+# group ning permissionlar listini olish
+aws --endpoint http://aws:4566 iam list-attached-group-policies --group-name project-sapphire-developers
+
+
+
+
+aws --endpoint http://aws:4566 iam attach-group-policy --group-name project-sapphire-developers --policy-arn arn:aws:iam::aws:policy/AmazonEC2FullAccess
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+############################################################################################################################
+<<< user yaratish uchun mapping
+############################################################################################################################
+
+resource "aws_iam_user" "users" {
+     name = var.project-sapphire-users[count.index]
+     count = length(var.project-sapphire-users)
+}
+
+
+variable "project-sapphire-users" {
+     type = list(string)
+     default = [ "mary", "jack", "jill", "mack", "buzz", "mater"]
+}
+
+
+
+
+
+
+
+
+resource "aws_instance" "cerberus" {
+  ami           = var.ami
+  instance_type = var.instance_type
+  user_data     = file("./install-nginx.sh")
+
+}
+resource "aws_key_pair" "cerberus-key" {
+  key_name   = "cerberus"
+  public_key = file(".ssh/cerberus.pub")
+}
+resource "aws_eip" "eip" {
+  vpc      = true
+  instance = aws_instance.cerberus.id
+  provisioner "local-exec" {
+    command = "echo ${aws_eip.eip.public_dns} >> /root/cerberus_public_dns.txt"
+  }
+
+}
+variable "ami" {
+  default = "ami-06178cf087598769c"
+}
+variable "instance_type" {
+  default = "m5.large"
+
+}
+variable "region" {
+  default = "eu-west-2"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

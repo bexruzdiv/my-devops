@@ -1,0 +1,59 @@
+version: '3'
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    networks:
+      - docker_network
+    ports:
+      - "27017:27017"
+    volumes:
+      - /root/mongo:/data/db  # Mount the volume to /home/ubuntu/mongo on the host to /data/db in the container
+
+  mongo-express:
+    restart: always
+    depends_on:
+      - "mongo"
+    image: mongo-express
+    container_name: mongo-express
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+    ports:
+      - "8081:8081"
+    networks:
+      - docker_network
+
+  api_front:
+    restart: always
+    image: bexruzdev/bot_api_front:4
+    container_name: api_front
+    ports:
+      - "5000:5000"
+    networks:
+      - docker_network
+  
+  bot_user:
+    restart: always 
+    image: bexruzdev/bot_user:7
+    container_name: bot_user
+    networks:
+      - docker_network
+
+  bot_frontend:
+    restart: always
+    image: bexruzdev/bot_frontend:2
+    container_name: bot_frontend
+    ports: 
+      - "80:80"
+    networks:
+      - docker_network
+networks:
+  docker_network:
+    driver: bridge
+
+

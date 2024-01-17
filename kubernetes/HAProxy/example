@@ -1,0 +1,63 @@
+[Forwarded from azizbek karimov proxima]
+global
+        log /dev/log    local0
+        log /dev/log    local1 notice
+        chroot /var/lib/haproxy
+        stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
+        stats timeout 30s
+        user haproxy
+        group haproxy
+        daemon
+        ca-base /etc/ssl/certs
+        crt-base /etc/ssl/private
+        ssl-default-bind-ciphers ECDHE...
+        ssl-default-bind-ciphersuites TLS_...
+        ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
+
+defaults
+        log     global
+        mode    http
+        option  httplog
+        option  dontlognull
+        option  forwardfor
+        option  http-server-close
+        timeout connect 5000
+        timeout client  50000
+        timeout server  50000
+        errorfile 400 /etc/haproxy/errors/400.http
+        errorfile 403 /etc/haproxy/errors/403.http
+        errorfile 408 /etc/haproxy/errors/408.http
+        errorfile 500 /etc/haproxy/errors/500.http
+        errorfile 502 /etc/haproxy/errors/502.http
+        errorfile 503 /etc/haproxy/errors/503.http
+        errorfile 504 /etc/haproxy/errors/504.http
+
+listen kubernetes-apiserver-https
+        bind *:8443
+        mode tcp
+        option log-health-checks
+        timeout client 3h
+        timeout server 3h
+        server master-01 localhost:6443 check check-ssl verify none inter 10000
+        balance roundrobin
+
+frontend https_frontend
+        mode http
+        option tcplog
+        bind *:80
+        #bind *:443 ssl crt /etc/ssl/PATH/DOMAIN.pem
+        http-request redirect scheme https unless { ssl_fc }
+        http-request set-header X-Forwarded-Port %[dst_port]
+        http-request add-header X-Forwarded-Proto https if { ssl_fc }
+        default_backend http_backend
+
+backend http_backend
+        mode http
+        option forwardfor
+        balance roundrobin
+        server worker-01 192.168.163.51:80 check port 80
+        server worker-02 192.168.163.52:80 check port 80
+
+
+
+        

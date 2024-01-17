@@ -1,0 +1,63 @@
+# Firstly download mc 
+wget https://dl.min.io/client/mc/release/linux-amd64/mc
+chmod +x mc
+sudo mv mc /usr/local/bin/
+
+# set alias for minio api 
+mc alias set minio1 http://65.108.243.18:9000 minioadmin minioadmin
+
+# check alias list
+mc alias list
+
+# create bucket 
+mc mb minio1/my-bucket
+
+# put files to minio 
+mc cp test.txt minio1/my-bucket/test.txt
+
+# Download files from minio
+mc cp minio1/my-bucket/test.txt test.txt
+
+# upload dir to minio
+mc cp -r DEVOPS/ minio1/my-bucket/
+
+#download dir from minio
+mc cp -r minio1/my-bucket/DEVOPS DEVOPS
+# search and fint files or dir 
+mc find minio1/my-bucket --name "ANSIBLE"
+
+mc find minio1/my-bucket --large 1m
+
+# see visual format like tree
+mc tree minio1/my-bucket
+  # like that
+    #    hetzner
+    #      └─ .terraform
+    #         └─ providers
+    #            └─ registry.terraform.io
+    #               └─ hetznercloud
+    #                  └─ hcloud
+    #                     └─ 1.44.1
+    #                        └─ linux_amd64
+
+
+
+# see tree with files
+mc tree --files minio1/my-bucket
+
+# move data to minio
+mc mv file.txt minio1/my-bucket/file.txt
+
+#move data from minio
+mc mv minio1/my-bucket/file.txt file.txt
+
+# remove data from minio
+mc rm minio1/my-bucket/file.txt
+mc rm -r --force minio1/my-bucket/DEVOPS
+mc rm --older-than 1d minio1/my-bucket
+
+# delete bucket
+mc rb localdata/
+mc rb --force minio1/my-bucket
+mc rb --force --dangerous minio1
+

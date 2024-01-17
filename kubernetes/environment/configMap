@@ -1,0 +1,13 @@
+### config map yaratish
+kubectl create configmap  webapp-config-map --from-literal=APP_COLOR=darkblue --from-literal=APP_OTHER=disregard
+
+
+### fileda belgilash
+spec:
+  containers:
+    - env:
+      - name: APP_COLOR
+        valueFrom:
+         configMapKeyRef:
+           name: webapp-config-map
+           key: APP_COLOR

@@ -1,0 +1,87 @@
+# sudo apt-get update
+# sudo apt-get install haproxy
+# configuration file
+# vi /etc/haproxy/haproxy.cfg
+# after configure
+# sudo systemctl restart haproxy
+# sudo systemctl enable haproxy
+# check
+# sudo netstat -tulpn
+
+
+#1
+
+# global and default is  default configuration.
+global
+    log /dev/log    local0
+    log /dev/log    local1 notice
+    chroot /var/lib/haproxy
+    stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
+    stats timeout 30s
+    user haproxy
+    group haproxy
+    daemon
+
+    tune.ssl.default-dh-param 2048  
+    ca-base /etc/ssl/certs
+    crt-base /etc/ssl/private
+    ssl-default-bind-ciphers ECDHE...
+    ssl-default-bind-ciphersuites TLS_...
+    ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
+
+defaults
+        log     global
+        mode    http
+        option  httplog
+        option  dontlognull
+        option  forwardfor
+        option  http-server-close
+        timeout connect 5000
+        timeout client  50000
+        timeout server  50000
+        errorfile 400 /etc/haproxy/errors/400.http
+        errorfile 403 /etc/haproxy/errors/403.http
+        errorfile 408 /etc/haproxy/errors/408.http
+        errorfile 500 /etc/haproxy/errors/500.http
+        errorfile 502 /etc/haproxy/errors/502.http
+        errorfile 503 /etc/haproxy/errors/503.http
+        errorfile 504 /etc/haproxy/errors/504.http
+
+#  configuration for master nodes. 
+listen kubernetes-apiserver-https
+        bind *:6443
+        mode tcp
+        option log-health-checks
+        timeout client 3h
+        timeout server 3h
+        server master-1 10.0.1.5:6443 check fall 3 rise 2
+        server master-2 10.0.0.3:6443 check fall 3 rise 2
+        server master-3 10.0.1.4:6443 check fall 3 rise 2
+        balance roundrobin
+
+#  configuration for 1 worker  node. 
+
+frontend http_frontend
+        mode tcp
+        option tcplog
+        bind *:80
+        default_backend http_backend
+
+backend http_backend
+        mode tcp
+        balance roundrobin
+        server worker-1 10.0.0.4:80 check port 80
+       
+frontend https_frontend
+	mode tcp
+	option tcplog
+	bind *:443
+	default_backend https_backend
+
+backend https_backend
+	mode tcp
+	balance roundrobin
+	server worker-1 10.0.0.4:443 check port 443
+
+
+

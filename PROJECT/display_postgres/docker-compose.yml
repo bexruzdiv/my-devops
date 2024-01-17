@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  postgres_nginx:
+    image: bexruzdev/postgres_nginx:2
+    ports:
+      - "8080:80"
+    volumes:
+      - /root/slq-data.html:/usr/share/nginx/html/slq-data.html
+
+  postgres_python:
+    image: bexruzdev/postgres_python:3
+    ports:
+      - "5000:5000"
+    volumes:
+      - /root/slq-data.html:/app/slq-data.html

@@ -1,0 +1,26 @@
+
+# agar kodga ozgarish va yangilanish kiritilsa destoy bolishidan avval ishga tushirish lozim
+
+resource "local_file" "pet" {
+    filename = "/root/pets.txt"
+    content = "we love pets"
+
+    lifecycle {
+        create_before_destroy = true
+    }
+}
+
+
+# agar biz file bloklab qoysak u destroy yoki update bolmaydi
+lifecycle {
+    prevent_destroy = true
+}
+
+
+# yoki malum bir ozgaruvchilarni bloklab qoyish
+lifecycle {
+    ignore_changes = [
+        filename, content
+    ]
+}
+

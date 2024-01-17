@@ -7,7 +7,7 @@
 ---- export ETCDCTL_API=3
 
 # etcd poddagi malumotlarni yordamida saqlanadi
----- etcdctl snapshot save \                            <---- asosiy kommanda 
+---- etcdctl snapshot save \                           
 --endpoints=127.0.0.1:2379 \
 > --cacert=/etc/kubernetes/pki/etcd/ca.crt \
 > --cert=/etc/kubernetes/pki/etcd/server.crt \
@@ -28,4 +28,6 @@
       type: DirectoryOrCreate
     name: etcd-data
 
+
+sudo kubectl delete po kube-system etcd-controlplane 
 

@@ -1,0 +1,30 @@
+<<<<-------------------- OS upgrade --------------->>>>
+
+### OS ni birinchi master node da yangilaymiz
+### agar master nodeda pod/deployment lar bolsa ularni boshqa node ga olamiz
+sudo kubectl drain --force --ignore-daemonsets master
+sudo apt upgrade kubeadm=1.28.2-00 -y 
+
+## ugrade tugagach uni
+sudo kubectl uncordon master
+
+### va barcha nodelarda qilinadi
+
+sudo kubectl drain --force --ignore-daemonsets worker-1
+sudo apt upgrade kubeadm=1.28.2-00 -y 
+sudo kubectl uncordon worker-1
+
+
+### worker 2 da ham 
+sudo kubectl drain --force --ignore-daemonsets worker-2
+sudo apt upgrade kubeadm=1.28.2-00 -y 
+sudo kubectl uncordon worker-2
+
+
+### kubeletni upgrade qilish
+
+sudo apt install kubelet=1.27.0-00
+sudo kubeadm upgrade node
+sudo systemctl daemon-reload
+sudo systemctl restart kubelet
+s   

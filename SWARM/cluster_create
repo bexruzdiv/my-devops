@@ -1,0 +1,10 @@
+docker swarm init --advertise-addr <manager-ip-address>
+
+
+
+docker swarm join --token <your-token> <manager-ip-address>:<manager-port>
+
+
+
+docker node ls
+

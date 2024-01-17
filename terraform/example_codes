@@ -1,0 +1,30 @@
+<<<<<<<------------ example codes --------- >>>>>>>>>
+
+resource "local_file" "pet" {
+    filename= "/root/pets.txt"
+    content= "we love pets"
+}
+
+<<<--------- run commands --------->>>>>
+
+terraform init 
+terraform plan
+terraform apply 
+
+
+<<<< ------ update file ---------- >>>>>
+
+resource "local_file" "pet" {
+    filename= "/root/pets.txt"
+    content= "we love pets"
+    file_permission = "0700"
+
+terraform plan 
+
+terraform apply 
+
+<<<< ------ destroy file ---------- >>>>>
+
+terraform destroy
+
+2i1xnSC2XDvBCSKZF9K10rmVVB2j6Iso89EjvBCvSElDs7tCgS0jKN5ja2R3vg3Z

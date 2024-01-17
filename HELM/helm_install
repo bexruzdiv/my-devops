@@ -1,0 +1,99 @@
+<<<<<<------- HELM instalition ----------->>>>
+
+sudo curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+sudo chmod 700 get_helm.sh
+sudo ./get_helm.sh
+
+#### yoki boshqa yo`l bilan install qilish
+wget https://get.helm.sh/helm-v3.12.3-linux-amd64.tar.gz
+tar -xzf helm-v3.12.3-linux-amd64.tar.gz    
+sudo mv ./linux-amd64/helm /usr/local/bin/
+
+#############
+helm version
+#############
+
+
+sudo helm repo add bitnami https://charts.bitnami.com/bitnami
+sudo helm repo update
+
+sudo helm install my-release bitnami/wordpress
+
+
+helm list
+
+helm uninstall my-release
+
+#######################################   aynan values file ichidagi contextni ozgartirib qoyish
+
+helm install --set variableku_bu="helm in file context " my-release bitnami/wordpress
+
+
+#######################################   values file ni boshqa filega ozgartirish
+helm install --values my-values.yaml my-release bitnami/wordpress
+
+
+
+####################################### file bilan birgalikda install qilish unzip formatda
+helm pull --untar bitnami/wordpress
+helm install my-release ./wordpress
+
+################## ornatilgan repo ni tekshirish 
+helm search repo wordpress
+
+
+################### delete repository
+helm repo remove hashicorp
+
+
+################## upgrade repository 
+helm upgrade nginx-release bitnami/nginx
+
+################## helm history
+helm history my-release
+
+################## history dan qaytgan malumotlar orqali rollback qilish
+helm rollback nginx-release 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

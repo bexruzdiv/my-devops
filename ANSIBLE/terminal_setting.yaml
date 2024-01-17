@@ -8,10 +8,6 @@
         name: zsh
         state: present
 
-    - name: Change the default shell to Zsh for the ubuntu user
-      become: yes
-      command:
-        cmd: chsh -s /bin/zsh ubuntu  # ubuntu o'rniga foydalanuvchi nomi o'zingizni qo'
 
     - name: Install Git
       become: yes
@@ -39,18 +35,3 @@
         path: /home/ubuntu/.zshrc
         line: 'plugins=(git zsh-autosuggestions zsh-syntax-highlighting )'
       become: yes
-
-
-    # - name: Replace the plugins line in .zshrc
-    #   become: yes
-    #   replace:
-    #     path: ~/.zshrc
-    #     regexp: '^plugins=\(git\)'
-    #     replace: 'plugins=(git zsh-autosuggestions zsh-syntax-highlighting)'
-        
-    # - name: Create a new .zshrc file with updated plugins
-    #   become: yes
-    #   lineinfile:
-    #     path: ~/.zshrc
-    #     line: 'plugins=(git zsh-autosuggestions zsh-syntax-highlighting )'
-    #     create: yes
