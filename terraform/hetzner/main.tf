@@ -30,8 +30,8 @@ resource "hcloud_network_subnet" "network-subnet-1" {
 
 
 
-resource "hcloud_server" "master" {
-  name       = "master1"
+resource "hcloud_server" "master-1" {
+  name       = "master-1"
   image      = "ubuntu-22.04"
   server_type = "cpx11"
   location   = "hel1"
@@ -114,4 +114,4 @@ resource "hcloud_server" "haproxy-server" {
 }
 
 
-#S7F225taF86ntiNiMooVeW0EM8d7n2E7El4Zc9DY1hJNev2pfoD0xcsPDBB8UJPK
+#yuCCqe97ActmOfO0prm3uVEq5V2NLljopQ2Mm5ACS3qKw30goLPXVgLaGkDAGy2m

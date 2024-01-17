@@ -1,0 +1,29 @@
+listen kubernetes-apiserver-https
+        bind *:6443
+        mode tcp
+        option log-health-checks
+        timeout client 3h
+        timeout server 3h
+        server master-1 10.0.1.5:6443 check fall 3 rise 2
+        balance roundrobin
+
+# configuration for 1 worker node.
+frontend http_frontend
+        mode tcp
+        option tcplog
+        bind *:80
+        default_backend http_backend
+backend http_backend
+        mode tcp
+        balance roundrobin
+        server worker-1 10.0.1.4:80 check port 80
+frontend https_frontend
+        mode tcp
+        option tcplog
+        bind *:443
+        default_backend https_backend
+
+backend https_backend
+        mode tcp
+        balance roundrobin
+        server worker-1 10.0.0.4:80 check port 80
