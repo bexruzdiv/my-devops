@@ -1,0 +1,3 @@
+NODENAME: "{{ ansible_hostname | regex_replace('-', '') }}"  
+POD_CIDR: "192.168.0.0/16"
+

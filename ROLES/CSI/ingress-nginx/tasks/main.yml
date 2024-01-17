@@ -1,0 +1,35 @@
+- name: Add Ingress-Nginx Helm repository
+  ansible.builtin.shell:
+    cmd: helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+  args:
+    executable: /bin/bash
+
+- name: Update Helm repositories
+  ansible.builtin.shell:
+    cmd: helm repo update
+  args:
+    executable: /bin/bash
+
+- name: Fetch Ingress-Nginx values
+  ansible.builtin.shell:
+    cmd: helm show values ingress-nginx/ingress-nginx > nginx-ingress-values.yaml
+  args:
+    executable: /bin/bash
+
+- name: Configure nginx-ingress values.yaml
+  ansible.builtin.replace:
+    path: nginx-ingress-values.yaml
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+  loop:
+    - { regexp: '^hostNetwork: false', replace: 'hostNetwork: true' }
+    - { regexp: '^kind: Deployment', replace: 'kind: DaemonSet' }
+    - { regexp: '^type: LoadBalancer', replace: 'type: ClusterIP' }
+    - { regexp: '^hostPort:\n *enabled: .*', replace: 'hostPort:\n  enabled: true' }
+
+- name: Install nginx-ingress with Helm
+  ansible.builtin.shell:
+    cmd: helm install nginx-ingress ingress-nginx/ingress-nginx --values nginx-ingress-values.yaml
+  args:
+    executable: /bin/bash
+

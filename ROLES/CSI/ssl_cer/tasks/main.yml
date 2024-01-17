@@ -1,0 +1,139 @@
+---
+- name: Download Helm
+  get_url:
+    url: https://get.helm.sh/helm-v3.12.3-linux-amd64.tar.gz
+    dest: /tmp/helm-v3.12.3-linux-amd64.tar.gz
+
+- name: Extract Helm
+  ansible.builtin.unarchive:
+    src: /tmp/helm-v3.12.3-linux-amd64.tar.gz
+    dest: /tmp
+
+- name: Move Helm binary to /usr/local/bin/
+  ansible.builtin.command:
+    cmd: mv /tmp/linux-amd64/helm /usr/local/bin/
+
+- name: Add Jetstack Helm Repository
+  ansible.builtin.shell:
+    cmd: helm repo add jetstack https://charts.jetstack.io
+
+- name: Update Helm Repositories
+  ansible.builtin.shell:
+    cmd: helm repo update
+
+- name: Run Helm Show Values Command
+  ansible.builtin.shell:
+    cmd: helm show values jetstack/cert-manager --version v1.13.2 > values.yml
+  args:
+    executable: /bin/bash
+
+- name: Open values.yml and modify installCRDs and prometheus settings
+  ansible.builtin.replace:
+    path: values.yml
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+  loop:
+    - { regexp: '^installCRDs: .*', replace: 'installCRDs: true' }
+    - { regexp: '^prometheus:\n *enabled: .*', replace: 'prometheus:\n  enabled: false' }
+
+- name: Run Helm Upgrade Command
+  ansible.builtin.shell:
+    cmd: helm upgrade cert-manager jetstack/cert-manager --install --create-namespace --namespace cert-manager --version v1.13.2 --values ./values.yml
+  args:
+    executable: /bin/bash
+
+- name: Create a file
+  file:
+    path: issuer.yml
+    state: touch
+
+- name: Create Issuer YAML File
+  ansible.builtin.blockinfile:
+    path: issuer.yml
+    block: |
+      apiVersion: cert-manager.io/v1
+      kind: Issuer
+      metadata:
+        name: letsencrypt-prod
+      spec:
+        acme:
+          server: https://acme-v02.api.letsencrypt.org/directory
+          email: <SOME_EMAIL>
+          privateKeySecretRef:
+            name: letsencrypt-prod
+          solvers:
+            - http01:
+                ingress:
+                  ingressClassName: nginx
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+
+- name: Apply Issuer Configuration
+  ansible.builtin.command:
+    cmd: kubectl apply -f issuer.yml
+  args:
+    executable: /bin/bash
+
+- name: Create a file
+  file:
+    path: example.yml
+    state: touch
+
+- name: Create example.yml
+  ansible.builtin.copy:
+    dest: example.yml
+    content: |
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: nginx-pod
+        labels:
+          app: nginx
+      spec:
+        containers:
+          - name: nginx-container
+            image: nginx:latest
+            ports:
+              - containerPort: 80
+
+      ---
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: nginx-service
+      spec:
+        selector:
+          app: nginx
+        ports:
+          - protocol: TCP
+            port: 80
+            targetPort: 80
+
+      ---
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: nginx-ingress
+        annotations:
+          cert-manager.io/issuer: letsencrypt-prod
+          kubernetes.io/ingress.class: nginx
+      spec:
+        rules:
+          - host: example.bexruzdev.uz
+            http:
+              paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: nginx-service
+                      port:
+                        number: 80
+        tls:
+          - hosts:
+              - example.bexruzdev.uz
+            secretName: nginx-ssl
+
+- name: Deploy example file to k8s
+  ansible.builtin.shell:
+    cmd: kubectl apply -f example.yml
+

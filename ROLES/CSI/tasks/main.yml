@@ -1,0 +1,23 @@
+- name: Add Helm repository
+  ansible.builtin.shell:
+    cmd: helm repo add mlohr https://helm-charts.mlohr.com/
+  args:
+    executable: /bin/bash
+
+- name: Update Helm repositories
+  ansible.builtin.shell:
+    cmd: helm repo update
+  args:
+    executable: /bin/bash
+
+- name: Install or Upgrade hcloud-csi-driver with Helm
+  ansible.builtin.shell:
+    cmd: >
+      helm upgrade --install -n kube-system hcloud-csi-driver mlohr/hcloud-csi-driver
+      --set secret.create=true
+      --set secret.hcloudApiToken={{ hcloud_api_token }}
+      --set storageClass.name=hcloud-volumes
+      --set storageClass.isDefault=true
+  args:
+    executable: /bin/bash
+
