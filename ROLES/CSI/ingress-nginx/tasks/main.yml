@@ -18,4 +18,4 @@
     cmd: helm install nginx-ingress ingress-nginx/ingress-nginx --set controller.hostPort.enabled=true --set controller.hostNetwork=true --set controller.service.type=ClusterIP --set controller.kind=DaemonSet
   args:
     executable: /bin/bash
-
+  
