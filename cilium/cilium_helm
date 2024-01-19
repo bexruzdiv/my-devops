@@ -1,0 +1,27 @@
+helm repo add cilium https://helm.cilium.io/
+
+
+helm install cilium cilium/cilium --version 1.14.6 \
+  --namespace kube-system
+
+
+cilium version --client
+
+############################
+#######   ENABLED
+############################
+
+
+
+
+helm upgrade cilium cilium/cilium --version 1.14.6 \
+   --namespace kube-system \
+   --reuse-values \
+   --set hubble.relay.enabled=true \
+   --set hubble.ui.enabled=true
+
+
+cilium hubble ui
+
+ssh -L 8085:localhost:12000 root@65.108.219.172   #portForward for hubble ui
+

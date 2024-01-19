@@ -1,0 +1,23 @@
+---
+- name: Add Cilium Helm repository
+  community.general.helm_repository:
+    name: cilium
+    repo: https://helm.cilium.io/
+
+- name: Install Cilium
+  community.general.helm:
+    name: cilium
+    chart_ref: cilium/cilium
+    version: {{ version }}
+    namespace: kube-system
+
+- name: Upgrade Cilium with Hubble configurations
+  community.general.helm:
+    name: cilium
+    chart_ref: cilium/cilium
+    version: {{ version }}
+    namespace: kube-system
+    reuse_values: true
+    values:
+      - hubble.relay.enabled=true
+      - hubble.ui.enabled=true

@@ -1,0 +1,3 @@
+---
+# vars file for cilium
+version: 1.14.6
