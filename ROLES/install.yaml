@@ -1,0 +1,7 @@
+---
+- name: Run My Role
+  hosts: localhost
+  become: true  # If your tasks require sudo privileges
+
+  roles:
+    - cilium
