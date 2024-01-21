@@ -1,23 +1,35 @@
+# roles/cilium_hubble/tasks/main.yml
+
 ---
-- name: Add Cilium Helm repository
-  community.general.helm_repository:
-    name: cilium
-    repo: https://helm.cilium.io/
+- ansible.builtin.shell:
+    cmd: helm repo add cilium https://helm.cilium.io/
+  args:
+    executable: /bin/bash
 
-- name: Install Cilium
-  community.general.helm:
-    name: cilium
-    chart_ref: cilium/cilium
-    version: {{ version }}
-    namespace: kube-system
+- ansible.builtin.shell:
+    cmd: helm install cilium cilium/cilium --version 1.14.6 --namespace kube-system
+  args:
+    executable: /bin/bash
 
-- name: Upgrade Cilium with Hubble configurations
-  community.general.helm:
-    name: cilium
-    chart_ref: cilium/cilium
-    version: {{ version }}
-    namespace: kube-system
-    reuse_values: true
-    values:
-      - hubble.relay.enabled=true
-      - hubble.ui.enabled=true
+- ansible.builtin.shell:
+    cmd: helm upgrade cilium cilium/cilium --version 1.14.6 --namespace kube-system --reuse-values --set hubble.relay.enabled=true --set hubble.ui.enabled=true
+  args:
+    executable: /bin/bash
+
+- ansible.builtin.shell:
+    cmd: cilium hubble port-forward&
+  args:
+    executable: /bin/bash
+
+- ansible.builtin.copy:
+    src: hubble.sh
+    dest: /root/hubble.sh
+    mode: '0755'
+
+- ansible.builtin.shell:
+    cmd: /root/hubble.sh
+  args:
+    executable: /bin/bash
+
+
+
