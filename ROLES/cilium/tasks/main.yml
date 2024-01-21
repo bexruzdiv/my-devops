@@ -37,8 +37,13 @@
   args:
     executable: /bin/bash
 
+- ansible.builtin.copy:
+    src: port.sh
+    dest: /root/port.sh
+    mode: '0755'
+
 - ansible.builtin.shell:
-    cmd: cilium hubble port-forward&
+    cmd: /root/port.sh
   args:
     executable: /bin/bash
 
