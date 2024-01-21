@@ -1,6 +1,8 @@
 # roles/cilium_hubble/tasks/main.yml
 
 ---
+- ansible.builtin.command:
+    cmd: "chown -R root:root /opt/cni/bin"
 - ansible.builtin.copy:
     src: hubble.sh
     dest: /root/hubble.sh
