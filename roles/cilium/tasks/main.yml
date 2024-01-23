@@ -28,7 +28,8 @@
     executable: /bin/bash
 
 - ansible.builtin.shell:
-    cmd: helm install cilium cilium/cilium --version {{ version }} --namespace kube-system --reuse-values --set hubble.relay.enabled=true --set hubble.ui.enabled=true
+    cmd: helm install cilium cilium/cilium --version {{ version }} --namespace kube-system --set hubble.relay.enabled=true --set hubble.ui.enabled=true --set relay.nodeSelector.kubernetes.io/hostname={{ master_name }}
+
   args:
     executable: /bin/bash
 

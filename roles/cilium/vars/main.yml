@@ -2,3 +2,4 @@
 # vars file for cilium
 
 version: 1.14.6
+master_name: master
