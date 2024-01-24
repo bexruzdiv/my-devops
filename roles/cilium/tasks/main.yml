@@ -1,47 +1,16 @@
 # roles/cilium_hubble/tasks/main.yml
 
 ---
-- ansible.builtin.command:
-    cmd: "chown -R root:root /opt/cni/bin"
-- ansible.builtin.copy:
-    src: hubble.sh
-    dest: /root/hubble.sh
-    mode: '0755'
-
 - ansible.builtin.shell:
-    cmd: /root/hubble.sh
-  args:
-    executable: /bin/bash
-
-- ansible.builtin.copy:
-    src: cilium.sh
-    dest: /root/cilium.sh
-    mode: '0755'
-
-- ansible.builtin.shell:
-    cmd: /root/cilium.sh
-  args:
-    executable: /bin/bash
-- ansible.builtin.shell:
-    cmd: helm repo add cilium https://helm.cilium.io/
+    cmd: helm --kubeconfig={{ kubeconfig }} repo add cilium https://helm.cilium.io/
   args:
     executable: /bin/bash
 
 - ansible.builtin.shell:
-    cmd: helm install cilium cilium/cilium --version {{ version }} --namespace kube-system --set hubble.relay.enabled=true --set hubble.ui.enabled=true 
-
+    cmd: helm --kubeconfig={{ kubeconfig }} upgrade --install cilium cilium/cilium --version {{ version }} --namespace kube-system --set hubble.relay.enabled=true --set hubble.ui.enabled=true --set hubble.tls.auto.enabled=true --set hubble.tls.auto.method=helm --set hubble.tls.auto.certValidityDuration=1095
   args:
     executable: /bin/bash
 
-- ansible.builtin.copy:
-    src: port.sh
-    dest: /root/port.sh
-    mode: '0755'
-
-- ansible.builtin.shell:
-    cmd: /root/port.sh
-  args:
-    executable: /bin/bash
 
 
 

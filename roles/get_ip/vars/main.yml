@@ -1,0 +1,4 @@
+---
+# vars file for get_ip
+inventory: /home/bexruz/inventory.ini
+kubeconfig: /home/bexruz/.kube/config

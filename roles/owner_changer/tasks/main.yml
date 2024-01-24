@@ -1,0 +1,9 @@
+---
+# tasks file for owner_changer
+- name: Ensure /opt/cni/bin directory has the correct permissions
+  file:
+    path: /opt/cni/bin
+    recurse: yes
+    owner: root
+    group: root
+    mode: '0755'

@@ -1,0 +1,16 @@
+---
+# tasks file for get_ip
+
+- name: Get IP addresses of cluster nodes
+  shell: "kubectl get nodes --kubeconfig={{ kubeconfig }} -o jsonpath='{.items[*].status.addresses[?(@.type==\"InternalIP\")].address}'"
+  register: cluster_ips
+
+- name: Separate IP addresses
+  set_fact:
+    separated_ips: "{{ cluster_ips.stdout_lines | join(' ') }}"
+
+- name: Generate Ansible Inventory
+  template:
+    src: inventory_template.ini.j2
+    dest: "{{ inventory }}"
+
