@@ -1,4 +1,4 @@
 [servers]
-{% for ip in separated_ips.split(' ') %}
-server{{ loop.index }} ansible_ssh_host={{ ip }} ansible_ssh_private_key_file=/home/bexruz/kubespray ansible_user=root ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+{% for item in separated_ips.split(' ') | zip(separated_nodes.split(' ')) | list %}
+{{ item.1 }} ansible_ssh_host={{ item.0 }} ansible_ssh_private_key_file=/home/bexruz/kubespray  ansible_user=root ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 {% endfor %}
