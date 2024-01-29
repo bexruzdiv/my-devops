@@ -1,0 +1,80 @@
+
+# ---
+# - name: Install required packages
+#   apt:
+#     name: "{{ item }}"
+#     state: present
+#   loop:
+#     - software-properties-common
+#     - wget
+
+# - name: Add HashiCorp GPG key
+#   shell: |
+#     wget -qO - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+#   become: true
+
+# - name: Add HashiCorp APT repository
+#   apt_repository:
+#     repo: "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ ansible_lsb.codename }} main"
+#     state: present
+
+# - name: Update apt packages
+#   apt:
+#     update_cache: yes
+
+# - name: Install Vault
+#   apt:
+#     name: vault
+#     state: present
+
+# - name: Create Vault configuration file
+#   template:
+#     src: vault.hcl_1
+#     dest: /etc/vault.d/vault.hcl
+
+# - name: run vault server
+#   ansible.builtin.shell:
+#     cmd: vault server -config=/etc/vault.d/vault.hcl -log-level=trace >/dev/null 2>&1 &
+# - name: run vault server
+#   command: vault server -config=/etc/vault.d/vault.hcl -log-level=trace >/dev/null 2>&1 &
+# - name: Run Vault server
+  # ansible.builtin.shell:
+    # cmd: "vault server -config=/etc/vault.d/vault.hcl -log-level=trace >/dev/null 2>&1 &"
+  
+
+
+
+
+- name: Run vault operator init
+  command: vault operator init -address=https://{{ domain_1 }}:8200
+  register: vault_init_output
+
+
+- set_fact:
+    unseal_key_1: "{{ vault_init_output.stdout_lines[0].split(': ')[1] }}"
+    unseal_key_2: "{{ vault_init_output.stdout_lines[1].split(': ')[1] }}"
+    unseal_key_3: "{{ vault_init_output.stdout_lines[2].split(': ')[1] }}"
+    unseal_key_4: "{{ vault_init_output.stdout_lines[3].split(': ')[1] }}"
+    unseal_key_5: "{{ vault_init_output.stdout_lines[4].split(': ')[1] }}"
+    root_token: "{{ vault_init_output.stdout_lines[6].split(': ')[1] }}"
+
+
+- name: Create /root/key file with unseal keys and root token
+  ansible.builtin.copy:
+    content: |
+      Unseal Key 1: {{ unseal_key_1 }}
+      Unseal Key 2: {{ unseal_key_2 }}
+      Unseal Key 3: {{ unseal_key_3 }}
+      Unseal Key 4: {{ unseal_key_4 }}
+      Unseal Key 5: {{ unseal_key_5 }}
+      Root Token: {{ root_token }}
+    dest: /root/key
+- name: Unseal Vault
+  ansible.builtin.shell:
+    cmd: vault operator unseal -address="https://{{ domain_1 }}:8200" "{{ item }}"
+  loop:
+    - "{{ unseal_key_1 }}"
+    - "{{ unseal_key_2 }}"
+    - "{{ unseal_key_3 }}"
+  loop_control:
+    loop_var: item

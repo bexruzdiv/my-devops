@@ -2,14 +2,14 @@
 # tasks file for get_ip
 
 - name: Get Node Names
-  command: kubectl get nodes -o custom-columns=NAME:.metadata.name --no-headers
+  command: kubectl get nodes --kubeconfig={{ kubeconfig }} -o custom-columns=NAME:.metadata.name --no-headers
   register: node_names_output
 - name: Separate node
   set_fact:
     separated_nodes: "{{ node_names_output.stdout_lines | join(' ') }}"
 
 - name: Get IP addresses of cluster nodes
-  shell: "kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type==\"InternalIP\")].address}'"
+  shell: "kubectl get nodes --kubeconfig={{ kubeconfig }} -o jsonpath='{.items[*].status.addresses[?(@.type==\"InternalIP\")].address}'"
   register: cluster_ips
 
 - name: Separate IP addresses
@@ -18,5 +18,5 @@
 - name: Generate Ansible node name
   template:
     src: inventory_template.ini.j2
-    dest: "inventory.ini"
+    dest: "{{ inventory }}"
 

@@ -1,0 +1,10 @@
+---
+# defaults file for vault_cluster
+
+unseal_key_1: ""
+unseal_key_2: ""
+unseal_key_3: ""
+unseal_key_4: ""
+unseal_key_5: ""
+root_token: ""
+
