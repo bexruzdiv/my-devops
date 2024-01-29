@@ -1,49 +1,51 @@
 
-# ---
-# - name: Install required packages
-#   apt:
-#     name: "{{ item }}"
-#     state: present
-#   loop:
-#     - software-properties-common
-#     - wget
+---
+- name: Install required packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - software-properties-common
+    - wget
 
-# - name: Add HashiCorp GPG key
-#   shell: |
-#     wget -qO - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-#   become: true
+- name: Add HashiCorp GPG key
+  shell: |
+    wget -qO - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+  become: true
 
-# - name: Add HashiCorp APT repository
-#   apt_repository:
-#     repo: "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ ansible_lsb.codename }} main"
-#     state: present
+- name: Add HashiCorp APT repository
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ ansible_lsb.codename }} main"
+    state: present
 
-# - name: Update apt packages
-#   apt:
-#     update_cache: yes
+- name: Update apt packages
+  apt:
+    update_cache: yes
 
-# - name: Install Vault
-#   apt:
-#     name: vault
-#     state: present
+- name: Install Vault
+  apt:
+    name: vault
+    state: present
 
-# - name: Create Vault configuration file
-#   template:
-#     src: vault.hcl_1
-#     dest: /etc/vault.d/vault.hcl
-
-# - name: run vault server
-#   ansible.builtin.shell:
-#     cmd: vault server -config=/etc/vault.d/vault.hcl -log-level=trace >/dev/null 2>&1 &
-# - name: run vault server
-#   command: vault server -config=/etc/vault.d/vault.hcl -log-level=trace >/dev/null 2>&1 &
-# - name: Run Vault server
-  # ansible.builtin.shell:
-    # cmd: "vault server -config=/etc/vault.d/vault.hcl -log-level=trace >/dev/null 2>&1 &"
-  
+- name: Create Vault configuration file
+  template:
+    src: vault.hcl_1
+    dest: /etc/vault.d/vault.hcl
 
 
 
+- name: Create runner vault file
+  template:
+    src: run_vault.sh
+    dest: /root/run_vault.sh
+- name: Run run_vault.sh script
+  command: bash /root/run_vault.sh
+  become: true
+
+
+- name: Pause for 7 seconds before proceeding
+  pause:
+    seconds: 7
 
 - name: Run vault operator init
   command: vault operator init -address=https://{{ domain_1 }}:8200
