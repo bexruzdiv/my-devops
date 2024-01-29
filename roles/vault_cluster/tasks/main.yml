@@ -7,50 +7,54 @@
   loop:
     - software-properties-common
     - wget
+  when: inventory_hostname == 'leader'
 
 - name: Add HashiCorp GPG key
   shell: |
     wget -qO - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
   become: true
-
+  when: inventory_hostname == 'leader'
 - name: Add HashiCorp APT repository
   apt_repository:
     repo: "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ ansible_lsb.codename }} main"
     state: present
-
+  when: inventory_hostname == 'leader'
 - name: Update apt packages
   apt:
     update_cache: yes
-
+  when: inventory_hostname == 'leader'
 - name: Install Vault
   apt:
     name: vault
     state: present
-
+  when: inventory_hostname == 'leader'
 - name: Create Vault configuration file
   template:
     src: vault.hcl_1
     dest: /etc/vault.d/vault.hcl
-
+  when: inventory_hostname == 'leader'
 
 
 - name: Create runner vault file
   template:
     src: run_vault.sh
     dest: /root/run_vault.sh
+  when: inventory_hostname == 'leader'
+
 - name: Run run_vault.sh script
   command: bash /root/run_vault.sh
   become: true
-
+  when: inventory_hostname == 'leader'
 
 - name: Pause for 7 seconds before proceeding
   pause:
     seconds: 7
-
+  when: inventory_hostname == 'leader'
+  
 - name: Run vault operator init
   command: vault operator init -address=https://{{ domain_1 }}:8200
   register: vault_init_output
-
+  when: inventory_hostname == 'leader'
 
 - set_fact:
     unseal_key_1: "{{ vault_init_output.stdout_lines[0].split(': ')[1] }}"
@@ -59,7 +63,7 @@
     unseal_key_4: "{{ vault_init_output.stdout_lines[3].split(': ')[1] }}"
     unseal_key_5: "{{ vault_init_output.stdout_lines[4].split(': ')[1] }}"
     root_token: "{{ vault_init_output.stdout_lines[6].split(': ')[1] }}"
-
+  when: inventory_hostname == 'leader'
 
 - name: Create /root/key file with unseal keys and root token
   ansible.builtin.copy:
@@ -71,6 +75,7 @@
       Unseal Key 5: {{ unseal_key_5 }}
       Root Token: {{ root_token }}
     dest: /root/key
+  when: inventory_hostname == 'leader'
 - name: Unseal Vault
   ansible.builtin.shell:
     cmd: vault operator unseal -address="https://{{ domain_1 }}:8200" "{{ item }}"
@@ -80,3 +85,4 @@
     - "{{ unseal_key_3 }}"
   loop_control:
     loop_var: item
+  when: inventory_hostname == 'leader'
