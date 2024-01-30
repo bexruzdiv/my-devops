@@ -1,15 +1,15 @@
-storage "raft" {
-  path    = "/opt/vault/data"
-  node_id = "raft_node_1"
-}
+  storage "raft" {
+    path    = "/opt/vault/data"
+    node_id = "raft_node_1"
+  }
 
-listener "tcp" {
-  address       = "{{ domain_1 }}:8200"
-  tls_disable   = false  # Enable TLS
-  tls_cert_file = "/etc/letsencrypt/live/{{ domain_1 }}/fullchain.pem"
-  tls_key_file  = "/etc/letsencrypt/live/{{ domain_1 }}/privkey.pem"
-}
+  listener "tcp" {
+    address       = "0.0.0.0:8200"
+    tls_disable   = false  # Enable TLS
+    tls_cert_file = "/etc/letsencrypt/live/{{ domain_1 }}/fullchain.pem"
+    tls_key_file  = "/etc/letsencrypt/live/{{ domain_1 }}/privkey.pem"
+  }
 
-api_addr     = "https://{{ domain_1 }}:8200"
-cluster_addr = "https://{{ domain_1 }}:8201"
-ui           = true
+  api_addr     = "https://{{ domain_1 }}:8200"
+  cluster_addr = "https://{{ domain_1 }}:8201"
+  ui           = true
