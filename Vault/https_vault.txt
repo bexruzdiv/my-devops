@@ -1,0 +1,33 @@
+#########################
+## /etc/vault.d/vault.hcl
+#########################
+
+
+storage "raft" {
+  path    = "/opt/vault/data"
+  node_id = "raft_node_1"
+}
+
+listener "tcp" {
+  address       = "vault2.bexruzdev.uz:8200"
+  tls_disable   = false  # Enable TLS
+  tls_cert_file = "/etc/letsencrypt/live/vault2.bexruzdev.uz/fullchain.pem"
+  tls_key_file  = "/etc/letsencrypt/live/vault2.bexruzdev.uz/privkey.pem"
+  tls_skip_verify = true
+}
+
+api_addr     = "https://vault2.bexruzdev.uz:8200"
+cluster_addr = "https://vault2.bexruzdev.uz:8201"
+ui           = true
+
+
+##### run server vault
+sudo vault server -config=/etc/vault.d/vault.hcl -log-level=trace
+
+##### node1
+export VAULT_ADDR=https://vault2.bexruzdev.uz:8200
+vault operator init
+
+
+
+

@@ -1,0 +1,41 @@
+sudo apt install -y software-properties-common
+
+
+wget -qO - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list > /dev/null
+
+sudo apt update
+
+sudo apt install vault
+
+vault --version
+
+vault server -dev
+#its running
+#get root token 
+
+
+#another terminal 
+export VAULT_ADDR='http://127.0.0.1:8200'
+
+export VAULT_TOKEN="your root token"
+
+#save data 
+vault kv put secret/myapp username=BLVCK name=Bexruz7
+
+#get data
+vault kv get secret/myapp
+
+#delete
+vault kv delete secret/myapp
+
+
+
+
+
+
+
+
+

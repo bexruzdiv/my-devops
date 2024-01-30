@@ -1,0 +1,90 @@
+Configuration 
+Node1
+vi /etc/vault.d/vault.hcl 
+ui = true
+cluster_addr  = "https://65.108.219.172:8201"
+api_addr      = "http://65.108.219.172:8200"
+disable_mlock = true
+storage "raft" {
+  path = "/opt/vault/data"
+  node_id = "raft_node_3"
+}
+
+listener "tcp" {
+  address     = "0.0.0.0:8200"
+  tls_disable = true
+}
+
+
+
+Node2
+
+ui = true
+cluster_addr  = "https://65.108.51.76:8201"
+api_addr      = "http://65.108.51.76:8200"
+disable_mlock = true
+storage "raft" {
+  path = "/opt/vault/data"
+  node_id = "raft_node_1"
+}
+
+listener "tcp" {
+  address     = "0.0.0.0:8200"
+  tls_disable = true
+}
+
+
+
+
+Node3
+
+
+ui = true
+cluster_addr  = "https://65.108.53.194:8201"
+api_addr      = "http://65.108.53.194:8200"
+disable_mlock = true
+storage "raft" {
+  path = "/opt/vault/data"
+  node_id = "raft_node_2"
+}
+
+listener "tcp" {
+  address     = "0.0.0.0:8200"
+  tls_disable = true
+}
+
+
+#each node run vault 
+
+sudo vault server -config=/etc/vault.d/vault.hcl -log-level=trace
+
+
+Commands:
+
+Node1:
+export VAULT_ADDR=http://127.0.0.1:8200
+vault operator init
+
+
+Node2 and Node3
+export VAULT_ADDR=http://leader_ip:8200
+vault operator raft join "http://leader_ip:8200"
+vault operator unseal ""
+vault operator unseal ""
+vault operator unseal ""
+
+
+Node2 and Node3
+export VAULT_ADDR=http://127.0.0.1:8200
+vault operator raft join "http://leader_ip:8200"
+vault operator unseal ""
+vault operator unseal ""
+vault operator unseal ""
+Node1:
+export VAULT_TOKEN=""
+vault operator raft list-peers
+
+
+
+
+
