@@ -1,5 +1,5 @@
 ---
 # vars file for vault_cluster
-domain_1: vault22.bexruzdev.uz
-# domain_2: vault12.bexruzdev.uz
-# domain_3: vault13.bexruzdev.uz
+domain_1: test11.bexruzdev.uz
+domain_2: test22.bexruzdev.uz
+domain_3: test33.bexruzdev.uz

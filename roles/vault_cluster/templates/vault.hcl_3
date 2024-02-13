@@ -4,12 +4,12 @@ storage "raft" {
 }
 
 listener "tcp" {
-  address       = {{ domain_3 }}:8200"
+  address       = "0.0.0.0:8200"
   tls_disable   = false  # Enable TLS
-  tls_cert_file = "/etc/letsencrypt/live/{{ domain_3 }}/fullchain.pem"
-  tls_key_file  = "/etc/letsencrypt/live/{{ domain_3 }}/privkey.pem"
+  tls_cert_file = "/opt/vault/tls/fullchain1.pem"
+  tls_key_file  = "/opt/vault/tls/privkey1.pem"
 }
 
-api_addr     = "https://{{ domain_3}}:8200"
+api_addr     = "https://{{ domain_3 }}:8200"
 cluster_addr = "https://{{ domain_3 }}:8201"
 ui           = true

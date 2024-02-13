@@ -1,3 +1,34 @@
+- name: Check if Helm is already installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/helm
+  register: helm_installed
+
+- name: Download Helm if not installed
+  ansible.builtin.get_url:
+    url: https://get.helm.sh/helm-v3.12.3-linux-amd64.tar.gz
+    dest: /tmp/helm-v3.12.3-linux-amd64.tar.gz
+  when: not helm_installed.stat.exists
+
+- name: Ensure destination directory exists
+  ansible.builtin.file:
+    path: /tmp/helm_extracted
+    state: directory
+  when: not helm_installed.stat.exists
+
+- name: Extract Helm if downloaded
+  ansible.builtin.unarchive:
+    src: /tmp/helm-v3.12.3-linux-amd64.tar.gz
+    dest: /tmp/helm_extracted
+    remote_src: yes
+  when: not helm_installed.stat.exists
+
+- name: Move Helm binary to /usr/local/bin/
+  ansible.builtin.command:
+    cmd: sudo mv /tmp/helm_extracted/linux-amd64/helm /usr/local/bin/
+  when: not helm_installed.stat.exists
+
+
+
 - name: Add Ingress-Nginx Helm repository
   ansible.builtin.shell:
     cmd: helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx

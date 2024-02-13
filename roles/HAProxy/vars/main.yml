@@ -1,2 +1,4 @@
 ---
 # vars file for HAProxy
+haproxy_master_1: 10.0.0.2
+haproxy_worker_1: 10.0.0.4

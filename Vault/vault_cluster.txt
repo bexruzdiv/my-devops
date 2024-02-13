@@ -20,8 +20,8 @@ listener "tcp" {
 Node2
 
 ui = true
-cluster_addr  = "https://65.108.51.76:8201"
-api_addr      = "http://65.108.51.76:8200"
+cluster_addr  = "https://127.0.0.1:8201"
+api_addr      = "http://127.0.0.1:8200"
 disable_mlock = true
 storage "raft" {
   path = "/opt/vault/data"
@@ -63,13 +63,13 @@ Commands:
 
 Node1:
 export VAULT_ADDR=http://127.0.0.1:8200
-vault operator init
+vault operator init > keys
 
 
 Node2 and Node3
 export VAULT_ADDR=http://leader_ip:8200
 vault operator raft join "http://leader_ip:8200"
-vault operator unseal ""
+vault operator unseal ""  
 vault operator unseal ""
 vault operator unseal ""
 
@@ -83,6 +83,7 @@ vault operator unseal ""
 Node1:
 export VAULT_TOKEN=""
 vault operator raft list-peers
+
 
 
 
