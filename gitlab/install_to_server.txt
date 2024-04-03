@@ -5,7 +5,7 @@ requirements:
 
 
 sudo apt-get update
-sudo apt-get install -y curl openssh-server ca-certificates tzdata perl
+sudo apt-get install -y curl openssh-server ca-certificates tzdata perl 
 
 
  sudo apt-get install -y postfix
@@ -15,12 +15,25 @@ sudo apt-get install -y curl openssh-server ca-certificates tzdata perl
 
 
  curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | sudo bash
- sudo EXTERNAL_URL="http://gitlab.bexuzdev.uz" apt-get install gitlab-ee
+ sudo EXTERNAL_URL="http://gitlab.bexuzdev.uz" apt-get install gitlab-eew 
 
 
 username: root
 password: cat /etc/gitlab/initial_root_password
 
+backup: sudo gitlab-backup create STRATEGY=copy
 
+#before restore CHECK PATH /var/opt/gitlab/backups/
+#sudo chown git:git /var/opt/gitlab/backups/1712041953_2024_04_02_16.10.1-ee_gitlab_backup.tar
 
+restore: 
+#Stop the processes that are connected to the database. 
+sudo gitlab-ctl stop puma
+sudo gitlab-ctl stop sidekiq
+# Verify
+sudo gitlab-ctl status
+
+sudo gitlab-backup restore BACKUP=1712041953_2024_04_02_16.10.1-ee
+sudo gitlab-ctl restart
+sudo gitlab-rake gitlab:check SANITIZE=true
 

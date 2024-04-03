@@ -1,9 +1,11 @@
 ---
 - name: Run My Role
-  hosts: localhost
+  hosts: servers
   become: true
-  # become_user: root
+  vars:
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+  become_user: root
   
 
   roles:
-    - get_ip
+    - owner_changer

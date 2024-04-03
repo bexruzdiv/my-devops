@@ -1,0 +1,87 @@
+sudo apt update & sudo apt upgrade -y
+
+#installing k3s
+curl -sfL https://get.k3s.io | sh -
+
+
+curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+
+sudo mv kustomize /usr/local/bin/sudo mv kustomize /usr/local/bin/
+
+
+
+which kustomize #checking output should be "/usr/local/bin/kustomize" 
+
+vi kustomization.yaml #name is important
+
+Put this context 
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - github.com/ansible/awx-operator/config/default?ref=0.28.0
+
+images:
+  - name: quay.io/ansible/aws-operator
+    newTag: 0.28.0
+namespace: awx
+
+
+
+kustomize build . |kubectl apply -f -
+
+kubectl get pods -n awx #checking of pods are  running
+
+
+vi awx.yaml
+Put this context
+---
+    apiVersion: awx.ansible.com/v1beta1
+    kind: AWX 
+    metadata:
+      name: awx
+    spec:
+      service_type: nodeport
+      nodeport_port: 30080
+
+
+vi kustomization.yaml
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - github.com/ansible/awx-operator/config/default?ref=0.28.0
+  - awx.yaml
+images:
+  - name: quay.io/ansible/aws-operator
+    newTag: 0.28.0
+namespace: awx
+
+kustomize build . |kubectl apply -f -
+
+#run this command in another terminal and wait until finished 
+kubectl logs -f deployments/awx-operator-controller-manager -c awx-manager --namespace awx
+
+awx running  port ip:30080
+
+username: admin
+you can get password with that command:
+kubectl get secret -n awx awx-admin-password -o jsonpath="{.data.password}"  | base64 --decode ; echo
+
+
+
+
+
+
+---
+apiVersion: awx.ansible.com/v1beta1
+kind: AWXBackup
+metadata:
+  name: awxbackup-13-03-2024
+  namespace: awx
+spec:
+  deployment_name: awx
+  backup_pvc: awx-backup-claim
+
+  # Uncomment to reveal "censored" logs
+  #no_log: false

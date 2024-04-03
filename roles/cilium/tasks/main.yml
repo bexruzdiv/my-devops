@@ -7,7 +7,12 @@
     executable: /bin/bash
 
 - ansible.builtin.shell:
-    cmd: helm --kubeconfig={{ kubeconfig }} upgrade --install cilium cilium/cilium --version {{ version }} --namespace kube-system --set hubble.relay.enabled=true --set hubble.ui.enabled=true --set hubble.tls.auto.enabled=true --set hubble.tls.auto.method=helm --set hubble.tls.auto.certValidityDuration=1095
+    cmd: helm --kubeconfig={{ kubeconfig }} upgrade --install cilium cilium/cilium --version {{ version }} --namespace kube-system 
+        --set hubble.relay.enabled=true 
+        --set hubble.ui.enabled=true 
+        --set hubble.tls.auto.enabled=true 
+        --set hubble.tls.auto.method=helm 
+        --set hubble.tls.auto.certValidityDuration=1095
   args:
     executable: /bin/bash
 

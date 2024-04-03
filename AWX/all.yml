@@ -1,0 +1,53 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: awx
+  name: sa-awx
+  annotations: {}
+secrets:
+  - name: containergroup-token-g955r
+imagePullSecrets:
+  - name: gitlab-registry
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: containergroup-token-g955r
+  namespace: awx
+  annotations:
+    kubernetes.io/service-account.name: sa-awx
+type: kubernetes.io/service-account-token
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: awx
+  name: awx-role
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods/attach"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: awx-role-binding
+  namespace: awx
+subjects:
+  - kind: ServiceAccount
+    name: sa-awx
+    namespace: awx
+roleRef:
+  kind: Role
+  name: awx-role
+  apiGroup: rbac.authorization.k8s.io
