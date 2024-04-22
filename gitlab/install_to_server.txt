@@ -15,7 +15,7 @@ sudo apt-get install -y curl openssh-server ca-certificates tzdata perl
 
 
  curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | sudo bash
- sudo EXTERNAL_URL="http://gitlab.bexuzdev.uz" apt-get install gitlab-eew 
+ sudo EXTERNAL_URL="http://gitlab.bexuzdev.uz" apt-get install gitlab-ee
 
 
 username: root

@@ -1,0 +1,92 @@
+---
+# defaults file for hostname
+
+hostname_role_enabled: false
+
+ldap_email: "bexruzturobjonov0955@gmail.com"
+
+
+ldap_master_hostname_name: "ldap42.bexruzdev.uz"
+ldap_replica_hostname_name: "ldap42.bexruzdev.uz"
+
+# Should the machine be rebooted when the hostname is changed?
+hostname_reboot: no
+
+
+
+
+## defaults for docker
+ldap_docker_daemon_config_file: "/etc/docker/daemon.json"
+
+
+
+
+## defaults for ldap
+
+ldap_data_dir: /var/lib/ipa-data
+ldap_user: '100000'
+ldap_group: '100000'
+
+ldap_setup_members:
+  master:
+    host: ldap42.bexruzdev.uz
+  replica:
+    host: ldap42.bexruzdev.uz
+
+
+
+
+ldap_setup_2nd_level_domain: "bexruzdev"
+ldap_setup_1st_level_domain: "uz"
+ldap_setup_main_domain: "BEXRUZDEV"
+
+
+ldap_setup_domain: "{{ ldap_setup_2nd_level_domain }}.{{ ldap_setup_1st_level_domain }}"
+
+ldap_setup_realm: "{{ ldap_setup_2nd_level_domain|upper }}.{{ ldap_setup_1st_level_domain|upper }}"
+
+ldap_setup_netbios_name: "{{ ldap_setup_2nd_level_domain|upper }}"
+
+ldap_setup_master_server_hostname: "{{ ldap_setup_members.master.host }}"
+ldap_setup_admin_username: "admin"
+ldap_setup_admin_password: "12345678"
+ldap_setup_dirsvc_password: "12345678"
+# ldap_image: "registry.prxm.uz/docker/free-ipa:centos8-stream"
+ldap_image: "bexruzdev/freeipa-centos-8-stream:v1"
+ldap_ports:
+  - 80:80           
+  - 389:389
+  - 636:636 
+  - 88:88
+  - 443:443
+  - 464:464
+  - 88:88/udp
+  - 464:464/udp
+  - 123:123/udp
+  - 55:53/udp
+ldap_volumes:
+  - /root/ipa-data:/data
+## defaults for ldap in docker systemd 
+
+
+ldap_master_host: ldap42.bexruzdev.uz
+ldap_master_command: | 
+  --domain={{ ldap_setup_domain }} \
+  --realm={{ ldap_setup_realm }} \
+  --ds-password={{ ldap_setup_admin_password }} \
+  --admin-password={{ ldap_setup_admin_password }} \
+  --netbios-name={{ldap_setup_main_domain }} \
+  -U \
+  --no-ntp
+
+ldap_replica_host: ldap42.bexruzdev.uz
+ldap_replica_command: |
+  ipa-replica-install \
+  --server={{ ldap_setup_master_server_hostname }} \
+  --domain={{ ldap_setup_domain }} \
+  --principal={{ ldap_setup_admin_username }} \
+  --password={{ ldap_setup_admin_password }} \
+  -U \
+  --realm={{ ldap_setup_realm }}
+
+

@@ -1,0 +1,57 @@
+---
+# Creating directory for ldap volume
+- name: Create a directory if it does not exist
+  ansible.builtin.file:
+    path: "{{ ldap_data_dir }}"
+    owner: "{{ ldap_user }}"
+    group: "{{ ldap_group }}"    
+    state: directory
+    mode: '0755'
+
+# Disabling selinux in centos
+- name: Disable selinux
+  ansible.builtin.shell: setenforce 0
+  when: ansible_facts['os_family'] == "CentOS"
+# Install ldap with docker images
+- name: "Pull ldap image"
+  docker_image:
+    name: "{{ ldap_image }}"
+    source: pull
+  tags:
+    - install
+
+
+- name: "Install Systemd service for ldap_master"
+  when: host_master|bool
+  template:
+    src: ldap_master.j2
+    dest: "/etc/systemd/system/ldap.service"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: "Install Systemd service for ldap_replica"
+  when: not host_master|bool
+  template:
+    src: ldap_replica.j2
+    dest: "/etc/systemd/system/ldap.service"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Reread systemd configs
+  systemd:
+    daemon_reload: yes
+  tags:
+    - install
+
+- name: "Enable and start ldap service"
+  systemd:
+    name: ldap
+    enabled: yes
+    state: restarted
+  tags:
+    - enable
+    - install
+
+

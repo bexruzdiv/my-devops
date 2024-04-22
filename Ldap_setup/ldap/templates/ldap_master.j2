@@ -1,0 +1,47 @@
+[Unit]
+Description=Docker Service for ldap
+After=network.service docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop -t 60 ldap
+ExecStartPre=-/usr/bin/docker rm ldap
+ExecStart=/usr/bin/docker run \
+--name ldap \
+{% if ldap_master_host is defined %}
+-h {{ ldap_master_host }} \
+{% endif %}
+--sysctl net.ipv6.conf.all.disable_ipv6=0 \
+--tmpfs /run \
+--tmpfs /tmp \
+{% if ldap_ports is defined %}
+{% for port in ldap_ports %}
+-p {{ port }} \
+{% endfor %}
+{% endif %}
+--dns="8.8.8.8" \
+{% if ldap_volumes is defined %}
+{% for volume in ldap_volumes %}
+-v {{ volume }} \
+{% endfor %}
+{% endif %}
+{% if ldap_networks is defined %}
+{% for network in ldap_networks %}
+--network {{ network }} \
+{% endfor %}
+{% endif %}
+{{ ldap_image }} \
+{{ ldap_master_command }}
+
+ExecStop=-/usr/bin/docker stop -t 60 ldap
+
+ExecReload=/usr/bin/docker restart ldap
+
+Restart=always
+RestartSec=20s
+
+SuccessExitStatus=SIGKILL SIGTERM 143 137
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service

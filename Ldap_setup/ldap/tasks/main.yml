@@ -1,0 +1,9 @@
+--- 
+- name: include tasks 
+  include_tasks: "{{ item }}"
+  loop:
+    - hostname.yml
+    - namespace.yml
+    - install_ldap.yml
+    - cert.yml
+...

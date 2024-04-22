@@ -1,0 +1,20 @@
+---
+#Manage Docker daemon configuration
+- name: Ensure Docker daemon config file exists
+  file:
+    path: "{{ ldap_docker_daemon_config_file }}"
+    state: touch
+
+- name: Load existing Docker daemon config
+  template:
+    src: daemon.j2
+    dest: "/etc/docker/daemon.json"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Restart Docker service if configuration changed
+  service:
+    name: docker
+    state: restarted
+  #when: ansible.diff.before | default({}) != ansible.diff.after

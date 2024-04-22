@@ -1,0 +1,23 @@
+#- name: install requirements
+#  ansible.builtin.package:
+#    name: "{{ hostname_requirements }}"
+#    state: present
+
+- name: set hostname for master
+  when:
+    - ansible_connection not in [ "container", "docker", "community.docker.docker" ]
+    - host_master|bool
+  ansible.builtin.hostname:
+    name: "{{ ldap_master_hostname_name }}"
+
+
+
+- name: set hostname for replica
+  when:
+    - ansible_connection not in [ "container", "docker", "community.docker.docker" ]
+    - not host_master|bool
+  ansible.builtin.hostname:
+    name: "{{ ldap_replica_hostname_name }}"
+
+  
+

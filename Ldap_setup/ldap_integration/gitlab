@@ -1,0 +1,54 @@
+How To Configure GitLab FreeIPA LDAP Authentication
+
+The pre-requisites for this setup are:
+1. Running GitLab Server
+2. Running FreeIPA Server
+
+# Step 1: Create LDAP Bind User on FreeIPA
+
+ We’ll need a user for binding to FreeIPA Server.  Login to your FreeIPA Server and create a user called gitlab
+
+Navigate to Identity > Users > Add
+
+
+# Step 2: Configure GitLab Server
+If you don’t have a domain name for FreeIPA Server configured on DNS, add the line to /etc/hosts file.
+
+sudo vim /etc/hosts
+
+192.168.3.10 ipa.example.com
+
+
+# Edit /etc/gitlab/gitlab.rb and enable LDAP
+
+gitlab_rails['ldap_enabled'] = true
+gitlab_rails['ldap_servers'] = YAML.load_file('/etc/gitlab/freeipa_settings.yml')
+
+# Lastly, create the YAML file to hold IPA connection settings
+
+sudo vim /etc/gitlab/freeipa_settings.yml   
+
+
+main:
+  label: 'FreeIPA'
+  host: 'ldap32.bexruzdev.uz' # IP Address of FreeIPA Server
+  port: 389
+  uid: 'uid'
+  method: 'tls'
+  bind_dn: 'uid=gitlab,cn=users,cn=accounts,dc=bexruzdev,dc=uz'  # write Bind User created in Step 1 (gitlab in this case)
+  password: 'password123'                                        # password of Bind User created in Step 1 (password123 in this case)
+  encryption: 'plain'
+  base: 'cn=accounts,dc=bexruzdev,dc=uz'                                           
+  verify_certificates: false
+  user_filter: '(memberof=CN=gitlab,CN=groups,CN=accounts,DC=bexruzdev,DC=uz)'      # write groupname to  memberof=CN=gitlab (gitlab group in this case)
+
+  attributes:
+    username: ['uid']
+    email: ['mail']
+    name: 'displayName'
+    first_name: 'givenName'
+    last_name: 'sn'
+
+
+# Reconfigure GitLab Server
+ sudo gitlab-ctl reconfigure

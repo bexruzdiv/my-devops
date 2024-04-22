@@ -6,7 +6,7 @@ va uni unzip qilish kerak
 --- unzip "loki-linux-amd64.zip"
 --- chmod a+x "loki-linux-amd64"
 
-yana bir narsani install qilish
+config install qilish
 --- wget https://raw.githubusercontent.com/grafana/loki/main/cmd/loki/loki-local-config.yaml
 
 

@@ -1,0 +1,10 @@
+---
+# defaults file for hostname
+
+hostname_role_enabled: false
+
+# The hostname to set. By default whatever the inventory is set to.
+hostname_name: "{{ host_hostname_set|default(inventory_hostname_short) }}"
+
+# Should the machine be rebooted when the hostname is changed?
+hostname_reboot: no

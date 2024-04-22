@@ -1,0 +1,22 @@
+# the fully qualified server (or service) name
+{% if host_master %}
+FQDN = {{ ldap_master_hostname_name }}
+{% else %}
+FQDN = {{ ldap_replica_hostname_name }}
+{% endif %}
+ALTNAMES = DNS:$FQDN
+
+# --- no modifications required below ---
+[ req ]
+default_bits = 2048
+default_md = sha256
+prompt = no
+encrypt_key = no
+distinguished_name = dn
+req_extensions = req_ext
+
+[ dn ]
+CN = $FQDN
+
+[ req_ext ]
+subjectAltName = $ALTNAMES

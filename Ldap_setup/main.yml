@@ -1,0 +1,7 @@
+---
+- name: Copy and configure inventory.ini to remote hosts
+  hosts: all
+  become: true
+  become_user: root
+  roles:
+    - ldap

@@ -1,0 +1,41 @@
+# ansible-galaxy collection install community.docker 
+- name: copy  files
+  template:
+    src: "{{ item }}"
+    dest: "/root/{{ item }}"
+  loop:
+    - ipa-httpd.cnf.j2
+    - renew-le.sh.j2
+    - setup-le.sh.j2
+
+
+- name: Copy files into the container
+  community.docker.docker_container_copy_into:
+    container: ldap
+    path: "/root/{{ item }}"
+    container_path: "/root/{{ item }}"
+  loop:
+    - ipa-httpd.cnf.j2
+    - renew-le.sh.j2
+    - setup-le.sh.j2
+
+# - name: Create a cron job
+#   cron:
+#     name: Run once after 5 minutes
+#     minute: "*/5"
+#     job: bash "/root/setup-le.sh.j2"  
+#     state: present
+#     user: root
+#     special_time: reboot
+
+
+# - name: Set cron job using 'at'
+#   community.docker.docker_container_exec:
+#     container: ldap
+#     command: echo "/bin/bash /root/setup-le.sh.j2" | at now + 5 minutes
+#     # privileged: yes
+#     user: root
+#   register: result
+
+
+

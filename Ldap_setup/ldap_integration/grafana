@@ -1,0 +1,77 @@
+Configure LDAP authentication
+The LDAP integration in Grafana allows your Grafana users to login with their LDAP credentials. 
+You can also specify mappings between LDAP group memberships and Grafana Organization user roles.
+
+To configure LDAP authentication:
+# Install Grafana "https://www.cherryservers.com/blog/install-grafana-ubuntu"
+# Install LDAP 
+# Set domain to LDAP server
+# copy /etc/ipa/ca.crt to grafana server (path: /etc/ipa/ca.crt)  from ldap server (inside container)
+
+# configuration file of Grafana (/etc/grafana/grafana.ini) to enable the LDAP module
+
+[auth.ldap]
+enabled = true
+config_file = /etc/grafana/ldap.toml
+
+# That's a good time to disable registering new users using the web form:
+
+[users]
+allow_sign_up = false
+allow_org_create = false
+
+# In the FreeIPA backend, I created two groups for Grafana:
+grafana-admins
+grafana-editors
+# and i create user named "grafana" with password "grafana" and added him to  groups"
+
+# We will talk Grafana roles in a second. I altered the Grafana LDAPconfiguration file (/etc/grafana/ldap.toml) like this:
+
+[[servers]]
+host = "ldap.test.uz"
+port = 636
+use_ssl = true
+ssl_skip_verify = true
+root_ca_cert = /etc/ipa/ca.crt
+
+# Search user bind dn: uid=your_ldap_user
+bind_dn = "uid=grafana,cn=users,cn=accounts,dc=test,dc=uz"
+# password for bind dn which grafana ldap (user your_ldap_user)
+bind_password = 'grafana'
+...
+# User search filter, for example "(cn=%s)" or "(sAMAccountName=%s)" or "(uid=%s)"
+search_filter = "(uid=%s)"
+
+# An array of base dns to search through
+search_base_dns = ["cn=users,cn=accounts,dc=test,dc=uz"]
+...
+## An array of the base DNs to search through for groups. Typically uses ou=groups
+group_search_base_dns = ["cn=groups,cn=accounts,dc=test,dc=uz"]
+
+# Specify names of the ldap attributes your ldap uses
+[servers.attributes]
+name = "givenName"
+surname = "sn"
+username = "uid"
+member_of = "memberOf"
+email =  "mail"
+
+# Administrators #set group name of ldap group (grafana-admins in this case)
+[[servers.group_mappings]]
+group_dn = "cn=grafana-admins,cn=groups,cn=accounts,dc=test,dc=uz"
+org_role = "Admin"
+
+# Editors #set group name of ldap group (grafana-editors in this case)
+[[servers.group_mappings]]
+group_dn = "cn=grafana-editors,cn=groups,cn=accounts,dc=test,dc=uz"
+org_role = "Editor"
+
+# Read-only for any authenticated user
+[[servers.group_mappings]]
+group_dn = "*"
+org_role = "Viewer"
+
+
+
+# Restart grafana service
+systemctl restart grafana-server

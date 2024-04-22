@@ -7,12 +7,5 @@ spec:
     - name: my-container
       image: nginx:latest
 
-apiVersion: v1
-kind: Pod
-metadata:
-  name: my-pod
-spec:
-  containers:
-    - name: my-container
-      image: nginx:latest
+
 
