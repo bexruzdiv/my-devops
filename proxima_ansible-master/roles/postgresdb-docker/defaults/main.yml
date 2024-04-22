@@ -1,0 +1,15 @@
+docker_postgresdb_port: 30034
+docker_postgresdb_root_password: diuKoz0die2aik9zohth8iTa2rui1bei
+docker_postgresdb_container_name: postgresdatabase
+docker_postgresdb_data_volume: /var/data/postgresdatabase
+docker_postgresdb_data_volume_in_docker: /var/lib/postgresql/data
+docker_postgresdb_socket_mounting: true
+docker_postgresdb_systemd_service_template: postgresdb.service.j2
+docker_postgresdb_systemd_service_path: /etc/systemd/system
+docker_postgresdb_image_name: postgres
+docker_postgresdb_image_version: 15.1
+docker_postgresdb_docker_image: "{{ docker_postgresdb_image_name }}:{{ docker_postgresdb_image_version }}"
+
+docker_postgresdb_systemd_config_template: file/postgresd.conf
+docker_postgresdb_systemd_config_in_docker: /etc/postgresd.conf
+docker_postgresdb_systemd_service_name: postgresdatabase.service

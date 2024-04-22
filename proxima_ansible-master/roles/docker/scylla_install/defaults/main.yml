@@ -1,0 +1,13 @@
+---
+docker_network:
+  - name: docker_network
+    state: present
+    driver: bridge
+
+scylla:
+  image: scylladb/scylla:5.0.13
+  user_name: shipox
+  password: sio8ShoM
+  networks:
+    - docker_network
+  external_port: 8000

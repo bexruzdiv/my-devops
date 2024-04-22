@@ -1,0 +1,21 @@
+{{ define "telegram" }}
+    {{ if gt (len .Alerts.Firing) 0 }}
+{{- len .Alerts.Firing }} alert(s)
+        {{- range .Alerts.Firing }} 
+❌ <u><b>{{ .Labels.alertname }}</b></u>
+{{ .Annotations.message }}
+{{ .Labels.job }}
+{{ .Labels.instance }}
+        {{ end }}
+    {{ end }}
+    {{ if gt (len .Alerts.Resolved) 0 }}
+{{- len .Alerts.Resolved }} alert(s)
+        {{- range .Alerts.Resolved }} 
+✅<u><b>{{ .Labels.alertname }}</b></u> 
+{{ .Labels.job }}
+{{ .Labels.instance }}
+{{ .StartsAt.Format "2006-01-02" }} - {{(.EndsAt.Sub .StartsAt).Truncate 1000000000}}
+{{ .StartsAt.Format "15:04:05" }} - {{ .EndsAt.Format "15:04:05" }}
+        {{ end }}
+    {{ end }}
+{{ end }} 

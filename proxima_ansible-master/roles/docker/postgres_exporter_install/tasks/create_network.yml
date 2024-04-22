@@ -1,0 +1,6 @@
+---
+- name: Create a network
+  docker_network:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    driver: "{{ item.driver }}"

@@ -1,0 +1,32 @@
+- name: Install pip and update package cache
+  apt:
+    update_cache: yes
+    name: python3-pip
+    state: present
+
+- name: Install pip pymongo
+  pip:
+    name: pymongo
+    state: present
+    executable: pip3
+
+- name: Generate MongoDB systemd file
+  template:
+    src: "{{ docker_mongodb_systemd_service_template }}"
+    dest: "{{ docker_mongodb_systemd_service_path }}/{{ docker_mongodb_container_name }}.service"
+    mode: 0744
+
+- name: Enable and start MongoDB service
+  systemd:
+    daemon_reload: yes
+    name: "{{ docker_mongodb_systemd_service_name }}"
+    enabled: yes
+    state: started
+
+# - name: Copy file to Docker container
+#   docker_container:
+#     name: "{{ docker_mongodb_container_name }}"
+#     copy:
+#       src: "{{ docker_mongodb_systemd_config_template }}"
+#       dest: "{{ docker_mongodb_systemd_config_in_docker }}"
+#     state: started

@@ -1,0 +1,37 @@
+[Unit]
+Description=Docker Service for {{ alertmanager.name }}
+After=network.service docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop -t 60 {{ alertmanager.name }}
+ExecStartPre=-/usr/bin/docker rm {{ alertmanager.name }}
+ExecStart=/usr/bin/docker run \
+--rm \
+--name {{ alertmanager.name }} \
+--publish {{ alertmanager.port }}:9093 \
+-v /etc/victoriametrics/alertmanager.yml:/config/alertmanager.yml \
+-v /etc/victoriametrics/default.tmpl:/config/default.tmpl \
+-v /usr/share/zoneinfo/Asia/Tashkent:/etc/localtime \
+{% if alertmanager.networks is defined %}
+{% for network in alertmanager.networks %}
+--network {{ network }} \
+{% endfor %}
+{% endif %}
+--log-driver 'syslog' \
+--log-opt 'tag={{ alertmanager.name }}' \
+{{ alertmanager.image }} \
+--config.file=/config/alertmanager.yml 
+ExecStop=-/usr/bin/docker stop -t 60 {{ alertmanager.name }}
+
+ExecReload=/usr/bin/docker restart '{{ alertmanager.name }}'
+
+Restart=always
+RestartSec=20s
+
+SuccessExitStatus=SIGKILL SIGTERM 143 137
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service
+

@@ -1,0 +1,20 @@
+[Unit]
+Description=Docker Service for {{ docker_mongodb_container_name }}
+After=docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=/usr/bin/docker rm {{ docker_mongodb_container_name }} --force
+ExecStart=/usr/bin/docker run \
+--name {{ docker_mongodb_container_name }} \
+-p {{ docker_mongodb_port }}:27017 \
+-v {{ docker_mongodb_data_volume }}:{{ docker_mongodb_data_volume_in_docker }} \
+-e MONGO_INITDB_ROOT_USERNAME=root \
+-e MONGO_INITDB_ROOT_PASSWORD={{ docker_mongodb_root_password }} {{ docker_mongodb_docker_image }}
+
+ExecStop=/usr/bin/docker stop {{ docker_mongodb_container_name }}
+Restart=always
+RestartSec=20s
+
+[Install]
+WantedBy=multi-user.target

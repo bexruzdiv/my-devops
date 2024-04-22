@@ -1,0 +1,56 @@
+# Copyright 2023 PROXIMAOPS LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Label kubernetes_monitoring_nodes
+  environment:
+    K8S_AUTH_KUBECONFIG: "{{ kubernetes_bootstrap_kubeconfig_path }}"
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Node
+    name: "{{ item }}"
+    definition:
+      metadata:
+        labels:
+          "node-role.kubernetes.io/monitoring": "true"
+    state: present
+  loop: "{{ kubernetes_monitoring_nodes }}"
+  when: kubernetes_monitoring_setup_nodes | default(true) and kubernetes_monitoring_nodes is defined
+  tags: setup_nodes
+
+- name: Create monitoring namespace
+  environment:
+    K8S_AUTH_KUBECONFIG: "{{ kubernetes_bootstrap_kubeconfig_path }}"
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: "{{ kubernetes_monitoring_namespace }}"
+    state: present
+  when: kubernetes_monitoring_setup_namespace | default(true)
+  tags: setup_namespace
+  
+# TODO: This is not working
+
+# - name: Wait for nodes to be labeled
+#   environment:
+#     K8S_AUTH_KUBECONFIG: "{{ kubernetes_bootstrap_kubeconfig_path }}"
+#   kubernetes.core.k8s_info:
+#     api_version: v1
+#     kind: Node
+#     label_selectors: "node-role.kubernetes.io/monitoring=true"
+#   register: k8s_nodes_labeled
+#   until: k8s_nodes_labeled.resources | length == kubernetes_monitoring_nodes | length
+#   retries: 3
+#   delay: 10
+#   when: kubernetes_monitoring_setup_nodes | default(true) and kubernetes_monitoring_nodes is defined
+#   tags: setup_nodes

@@ -1,0 +1,143 @@
+---
+- name: set pipefail 
+  hosts: localhost
+  become: true
+  tasks:
+    # - name: Kodni ishga tushirish
+    #   command: "set -euxo pipefail "
+    - name: Turn off swap
+      command: sudo swapoff -a
+
+    - name: Add crontab entry for swapoff
+      cron:
+        name: "Disable swap on reboot"
+        job: "/sbin/swapoff -a"
+        user: root
+        cron_file: true
+      ignore_errors: true
+      
+    - name: Run apt-get update
+      apt:
+        update_cache: yes
+
+    - name: Creating a file with content
+      copy:
+        dest: "/etc/modules-load.d/crio.conf"
+        content: |
+          overlay
+          br_netfilter    
+
+    - name: modprobe overlay
+      command: sudo modprobe overlay
+  
+    - name: br_netfilter
+      command: sudo modprobe br_netfilter
+
+    - name: create file kubernetes-cri.conf
+      copy:
+        dest: "/etc/sysctl.d/99-kubernetes-cri.conf"
+        content: |
+          net.bridge.bridge-nf-call-iptables  = 1
+          net.ipv4.ip_forward                 = 1
+          net.bridge.bridge-nf-call-ip6tables = 1
+
+    - name: Run sysctl --system
+      command: sysctl --system
+
+    - name: create file devel:kubic:libcontainers:stable.list
+      copy:
+        dest: "/etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list"
+        content: |
+          deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_22.04/ /
+
+    - name: create file devel:kubic:libcontainers:stable.list
+      copy:
+        dest: "/etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:1.28.list"
+        content: |
+          deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.28/xUbuntu_22.04/ /
+
+    - name: Add GPG key for cri-o repository
+      shell: "curl -L https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:1.28/xUbuntu_22.04/Release.key | sudo apt-key --keyring /etc/apt/trusted.gpg.d/libcontainers.gpg add -"
+      become_user: root
+
+
+    - name: Add GPG key for libcontainers repository
+      shell: "curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_22.04/Release.key | sudo apt-key --keyring /etc/apt/trusted.gpg.d/libcontainers.gpg add -"
+      become_user: root
+
+    - name: Update package cache
+      apt:
+        update_cache: yes
+
+    - name: Install cri-o and cri-o-runc
+      apt:
+        name:
+          - cri-o
+          - cri-o-runc
+        state: present
+
+    - name: Reload systemd
+      command: "sudo systemctl daemon-reload"
+      become_user: root
+
+    - name: Enable and start cri-o service
+      systemd:
+        name: crio
+        enabled: yes
+        state: started
+      become_user: root
+
+    - name: Display success message
+      debug:
+        msg: "CRI runtime installed successfully"
+
+    - name: Update package cache
+      apt:
+        update_cache: yes
+
+    - name: Install required packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+        state: present
+
+    - name: Download Kubernetes archive keyring
+      get_url:
+        url: "https://dl.k8s.io/apt/doc/apt-key.gpg"
+        dest: "/usr/share/keyrings/kubernetes-archive-keyring.gpg"
+        mode: "0644"
+      become_user: root
+
+
+    - name: Add Kubernetes repository to apt sources
+      shell: "echo 'deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main' | sudo tee /etc/apt/sources.list.d/kubernetes.list"
+      become_user: root
+
+    - name: Update package cache
+      apt:
+        update_cache: yes
+
+    - name: Install Kubernetes components
+      apt:
+        name:
+          - kubelet=1.28.1-00
+          - kubectl=1.28.1-00
+          - kubeadm=1.28.1-00
+        state: present
+
+    - name: Install jq
+      apt:
+        name: jq
+        state: present
+    - name: Get local IP address
+      shell: "ip --json addr show eth0 | jq -r '.[0].addr_info[] | select(.family == \"inet\") | .local'"
+      register: local_ip_result
+    - name: Create /etc/default/kubelet with local IP
+      become: true
+      become_user: root
+      copy:
+        content: "KUBELET_EXTRA_ARGS=--node-ip={{ local_ip_result.stdout }}"
+        dest: /etc/default/kubelet
+

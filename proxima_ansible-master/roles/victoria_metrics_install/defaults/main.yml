@@ -1,0 +1,84 @@
+---
+
+user_name: modme
+user_primary_group: modme
+
+docker_network:
+  - name: docker_network
+    state: present
+    driver: bridge
+
+vmagent:
+  name: vmagent
+  image: victoriametrics/vmagent:v1.89.1
+  port: 8429
+  networks:
+    - docker_network
+  jobs:
+    - node
+    - php-fpm
+    - nginx-prometheus-exporter
+  extra_hosts:
+    - name: production-server
+      ip: 91.213.99.137
+      port: 9100
+      job: node
+    - name: prod-php-server
+      ip: 91.213.99.137
+      port: 9253
+      job: php-fpm
+    - name: monitoring-server
+      ip: 91.213.99.230
+      port: 9100
+      job: node
+    - name: production-nginx-server
+      ip: 91.213.99.137
+      port: 9113
+      job: nginx-prometheus-exporter
+    - name: production-fluent-server
+      ip: 91.213.99.137
+      port: 24321
+      job: nginx-prometheus-exporter
+    - name: modmedb1-server
+      ip: 91.213.99.145
+      port: 9100
+      job: node
+    - name: modmedb2-server
+      ip: 91.213.99.144
+      port: 9100
+      job: node
+
+
+victoriametrics:
+  name: victoriametrics
+  image: victoriametrics/victoria-metrics:v1.89.1
+  ports:
+    graphiteListenAddr: 2003
+    opentsdbListenAddr: 4242
+    httpListenAddr: 8428
+    influxListenAddr: 8089
+  networks:
+    - docker_network
+
+grafana:
+  name: grafana
+  image: grafana/grafana:9.2.7
+  port: 3000
+  networks:
+    - docker_network
+
+vmalert:
+  name: vmalert
+  image: victoriametrics/vmalert:v1.89.1
+  port: 8880
+  networks:
+    - docker_network
+
+alertmanager:
+  name: alertmanager
+  image: prom/alertmanager:v0.25.0
+  port: 9093
+  bot_token: 6197970283:AAFV_llh9ntoowtEvFdqRBBzmQrSucAafGw
+  chat_id: -1001979647105
+  networks:
+    - docker_network

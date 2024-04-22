@@ -1,0 +1,8 @@
+---
+- name: "Install monitoring"
+  hosts: "{{ hostname }}"
+  gather_facts: no
+  become: yes
+
+  roles:
+    - role: monitoring/node_exporter

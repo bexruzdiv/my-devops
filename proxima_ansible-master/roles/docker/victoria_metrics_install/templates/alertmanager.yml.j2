@@ -1,0 +1,34 @@
+route:
+  group_wait: 1s
+  group_interval: 5s
+  repeat_interval: 5h
+  group_by: []
+  receiver: "{{ alertmanager.default_receiver }}"
+  routes:
+{% if alertmanager.routes is defined %}
+{% for host in alertmanager.routes %}
+    - match: "{{ host.match }}"
+      receiver: "{{ host.reseiver }}"
+{% endfor %}
+{% endif %}
+receivers:
+{% for receiver in alertmanager.receivers %}
+  - name: {{ receiver.name }}
+    telegram_configs:
+      - bot_token: {{ receiver.token }}
+        # send_resolved: true
+        chat_id: {{ receiver.chat_id }}
+        api_url: https://api.telegram.org
+        parse_mode: "HTML"
+        {% raw %}
+        message: '{{ template "telegram" .}}'
+        {% endraw %}
+
+{% endfor %}
+
+templates:
+  - "/config/default.tmpl"
+# time_intervals:
+#   - name: tashkent
+#     time_intervals:
+#       - location: Asia/Tashkent

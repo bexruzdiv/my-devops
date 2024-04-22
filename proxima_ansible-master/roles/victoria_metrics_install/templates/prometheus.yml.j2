@@ -1,0 +1,30 @@
+global:
+  scrape_interval: 10s
+
+scrape_configs:
+  - job_name: 'vmagent'
+    static_configs:
+      - targets: ['vmagent:8429']
+  - job_name: 'node-exporter'
+    static_configs:
+  - job_name: 'vmalert'
+    static_configs:
+      - targets: ['vmalert:8880']
+  - job_name: 'victoriametrics'
+    static_configs:
+      - targets: ['victoriametrics:8428']
+
+{% if vmagent.jobs is defined %}
+{% for job in vmagent.jobs %}
+  - job_name: '{{ job }}'
+    static_configs:
+{% if vmagent.extra_hosts is defined %}
+{% for host in vmagent.extra_hosts %}
+{% if host.job == job %}
+      - targets: ['{{ host.name }}:{{ host.port }}']
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% endif %}
+

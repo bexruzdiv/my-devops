@@ -1,0 +1,16 @@
+---
+teleport_version: "10.3.4"
+teleport_architecture: "amd64-bin"
+teleport_auth_token: "224d013595c9263684eef0da73e61322"
+teleport_ca_pin: "sha256:e03d7f0eb041b9b94de5bc577dbb32f7e4ace32df24d771ba51b090ca4e4be50"
+teleport_auth_servers:
+  - "https://teleport.udevs.io"
+teleport_url: "https://get.gravitational.com/teleport-v{{ teleport_version }}-linux-{{ teleport_architecture }}.tar.gz"
+teleport_config_path: "/etc/teleport.yaml"
+backup_teleport_config: yes
+teleport_config_template: "default_teleport.yaml.j2"
+teleport_service_template: "default_teleport.service.j2"
+teleport_control_systemd: yes
+teleport_template_config: yes
+# Default dont change
+update_teleport: no

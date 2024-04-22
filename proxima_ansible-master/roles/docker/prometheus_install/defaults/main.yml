@@ -1,0 +1,20 @@
+---
+docker_network:
+  - name: docker_network
+    state: present
+    driver: bridge
+
+prometheus:
+  image: "prom/prometheus:v2.33.5"
+  external_port: 9090
+  user_name: zafar
+  networks:
+    - docker_network
+  exporter_monitoring_group: "paynet_monitoring"
+  exporters:
+    - jobname: node
+      exporter:
+        - targets: "node-exporter:9100" # ne-paynet.udevs.io:80
+    - jobname: postgres
+      exporter:
+        - targets: "postgres-exporter:9187" # pe-paynet.udevs.io:80

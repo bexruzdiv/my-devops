@@ -1,0 +1,72 @@
+# Copyright 2023 PROXIMAOPS LLC
+#
+# Licensed under the Apache License, Version 2.0 (the License);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an AS IS BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# get dashboard providers from defaults using jinja for loop
+
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+{% for provider in kubernetes_monitoring_grafana_dashboard_providers %}
+      - name: {{ provider.name }}
+        orgId: {{ provider.orgId }}
+        folder: {{ provider.folder }}
+        type: {{ provider.type }}
+        disableDeletion: {{ provider.disableDeletion }}
+        editable: {{ provider.editable }}
+        options:
+          path: {{ provider.options.path }}
+{% endfor %}
+
+
+## Configure grafana dashboard to import
+## NOTE: To use dashboards you must also enable/configure dashboardProviders
+## ref: https://grafana.com/dashboards
+##
+## dashboards per provider, use provider name as key.
+##
+dashboards:
+{% for provider, dashboards in kubernetes_monitoring_grafana_dashboards.items() %}
+  {{ provider }}:
+{% for dashboard, config in dashboards.items() %}
+    {{ dashboard }}:
+{% if config.url is defined %}
+      url: {{ config.url }}
+{% endif %}
+
+{% if config.token is defined %}
+      token: {{ config.token }}
+{% endif %}
+
+{% if config.gnetId is defined %}
+      gnetId: {{ config.gnetId }}
+{% endif %}
+
+{% if config.revision is defined %}
+      revision: {{ config.revision }}
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+
+## Reference to external ConfigMap per provider. Use provider name as key and ConfigMap name as value.
+## A provider dashboards must be defined either by external ConfigMaps or in values.yaml, not in both.
+## ConfigMap data example:
+##
+## data:
+##   example-dashboard.json: |
+##     RAW_JSON
+##
+dashboardsConfigMaps: {}
+#  default: 

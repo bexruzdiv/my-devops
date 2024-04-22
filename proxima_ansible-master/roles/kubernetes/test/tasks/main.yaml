@@ -1,0 +1,29 @@
+- name: install pre-requisites
+  pip:
+    name:
+      - pyyaml
+      - kubernetes 
+
+- name: get kubeconfig from vault
+  set_fact:
+    kubeconfig: "{{ lookup('hashi_vault', 'secret=secret/data/k8s/{{ project_name }}/kubeconfig:config.yaml') | from_json | to_yaml }}"
+
+- name: delete file if exists
+  local_action:
+    module: file
+    path: /tmp/kubeconfig.yaml
+    state: absent
+
+- name: save kubeconfig as a file
+  local_action:
+    module: copy
+    content: "{{ kubeconfig }}"
+    dest: /tmp/kubeconfig.yaml
+
+- name: Create a k8s namespace
+  kubernetes.core.k8s:
+    name: testing
+    api_version: v1
+    kind: Namespace
+    state: present
+    kubeconfig: /tmp/kubeconfig.yaml

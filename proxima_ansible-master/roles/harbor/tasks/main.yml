@@ -1,0 +1,87 @@
+---
+
+- name: "Create data folder for Harbor"
+  file:
+    path: "{{ item.value.path }}"
+    # owner: "{{ item.value.owner }}"
+    # group: "{{ item.value.group }}"
+    state: "directory"
+  with_dict:
+    - "{{ harbor.folders }}"
+
+- name: "Create initial data folder for Harbor"
+  file:
+    path: "{{ harbor.harbor_initial_data_folder }}"
+    state: "directory"
+
+- name: "Unpack Harbor installer"
+  ansible.builtin.unarchive:
+    src: "{{ harbor.package_url }}"
+    dest: "{{ harbor.folders.setup_folder.path }}"
+    remote_src: yes
+    owner: "{{ harbor.folders.setup_folder.owner }}"
+    group: "{{ harbor.folders.setup_folder.group }}"
+    extra_opts: [--strip-components=1]
+
+
+- name: "Copy harbor.yml.tmpl to harbor.yml"
+  copy:
+    src: "{{ harbor.folders.setup_folder.path }}/harbor.yml.tmpl"
+    dest: "{{ harbor.folders.setup_folder.path }}/harbor.yml"
+    remote_src: true
+    owner: "{{ harbor.folders.setup_folder.owner }}"
+    group: "{{ harbor.folders.setup_folder.group }}"
+
+
+- name: "Create link from {{ harbor.folders.data_folder.path }} to {{ harbor.harbor_initial_data_folder }}"
+  file:
+    path: "{{ harbor.folders.data_folder.path }}"
+    src: "{{ harbor.harbor_initial_data_folder }}"
+    state: link
+    force: yes
+
+
+- name: "Replace lines"
+  lineinfile:
+    path: "{{ harbor.folders.setup_folder.path }}/harbor.yml"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - regexp: '^https:$'
+      line: 'https123:'
+    - regexp: '^hostname: reg.mydomain.com$'
+      line: "hostname: {{ ansible_host }}"
+    - regexp: '^  port: 80$'
+      line: "  port: 8080"
+
+
+- name: "Install commands"
+  block:
+
+    - name: "Prepare Harbor"
+      register: prepare
+      args:
+        chdir: "{{ harbor.folders.setup_folder.path }}"
+      shell: ./prepare
+
+    - name: "Debug prepare step"
+      debug:
+        var: prepare.stdout
+
+
+    - name: "Install Harbor"
+      register: install
+      args:
+        chdir: "{{ harbor.folders.setup_folder.path }}"
+      shell: ./install.sh
+
+
+    - name: "Debug install step"
+      debug:
+        var: install.stdout
+
+- name: "Extract password to file"
+  shell: "cat harbor.yml | grep 'harbor_admin_password' | awk '{ print $2 }' > initial_pass.txt"
+  args:
+    chdir: "{{ harbor.folders.setup_folder.path }}"
+    creates: "initial_pass.txt"

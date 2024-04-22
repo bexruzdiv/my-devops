@@ -1,0 +1,37 @@
+[Unit]
+Description=Docker Service for codeserver
+After=network.service docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop -t 60 codeserver
+ExecStartPre=-/usr/bin/docker rm codeserver
+ExecStart=/usr/bin/docker run \
+--rm \
+--name codeserver \
+-p {{ codeserver.external_port }}:8080 \
+{% if codeserver.networks is defined %}
+{% for network in codeserver.networks %}
+--network {{ network }} \
+{% endfor %}
+{% endif %}
+--log-driver 'syslog' \
+--log-opt 'tag=codeserver' \
+-v "/var/www/codeserver/.config:/home/coder/.config" \
+-v "/var/www/codeserver/workspace:/home/coder/project" \
+-u "ubuntu:ubuntu" \
+-e "DOCKER_USER=ubuntu" \
+{{ codeserver.image }} 
+ExecStop=-/usr/bin/docker stop -t 60 codeserver
+
+ExecReload=/usr/bin/docker restart 'codeserver'
+
+Restart=always
+RestartSec=20s
+
+SuccessExitStatus=SIGKILL SIGTERM 143 137
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service
+

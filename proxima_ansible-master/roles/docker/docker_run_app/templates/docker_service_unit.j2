@@ -1,0 +1,63 @@
+[Unit]
+Description=Docker Service for {{ item.name }}
+After=network.service docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop -t 60 {{ item.name }}
+ExecStartPre=-/usr/bin/docker rm {{ item.name }}
+ExecStart=/usr/bin/docker run \
+{% if item.rm is defined %}
+--rm \
+{% endif %}
+--name {{ item.name }} \
+{% if item.ports is defined %}
+{% for port in item.ports %}
+--publish {{ port }} \
+{% endfor %}
+{% endif %}
+{% if item.volumes is defined %}
+{% for volume in item.volumes %}
+-v {{ volume }} \
+{% endfor %}
+{% endif %}
+{% if item.networks is defined %}
+{% for network in item.networks %}
+--network {{ network }} \
+{% endfor %}
+{% endif %}
+{% if item.environments is defined %}
+{% for environment in item.environments %}
+-e {{ environment }} \
+{% endfor %}
+{% endif %}
+--log-driver="loki" \
+--log-opt loki-url="http://65.109.160.170:3100/loki/api/v1/push" \
+--log-opt loki-batch-size="400" \
+--log-opt loki-retries="5" \
+--log-opt max-size="2g" \
+{% if item.health is defined %}
+--health-cmd {{ item.health.cmd }} \
+--health-interval {{ item.health.interval }} \
+--health-retries {{ item.health.retries }} \
+--health-timeout {{ item.health.timeout }} \
+{% endif %}
+{% if item.command is defined %}
+{{ item.image }} \
+{{ item.command }}
+{% else %}
+{{ item.image }}
+{% endif %}
+ExecStop=-/usr/bin/docker stop -t 60 {{ item.name }}
+
+ExecReload=/usr/bin/docker restart '{{ item.name }}'
+
+Restart=always
+RestartSec=20s
+
+SuccessExitStatus=SIGKILL SIGTERM 143 137
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service
+

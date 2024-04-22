@@ -1,0 +1,85 @@
+### Vicotoria global settings
+
+kubernetes_monitoring_victoria_release_name: victoria
+kubernetes_monitoring_victoria_chart_name: vm/victoria-metrics-k8s-stack
+kubernetes_monitoring_victoria_chart_version: 0.17.4
+kubernetes_monitoring_victoria_setup_values_file: "{{ lookup('template', 'victoria/main.yaml') | from_yaml }}"
+
+### Default rules for Victoria
+
+kubernetes_monitoring_victoria_default_rules_create: "true"
+kubernetes_monitoring_victoria_default_rules_etcd: "true"
+kubernetes_monitoring_victoria_default_rules_general: "true"
+kubernetes_monitoring_victoria_default_rules_k8s: "true"
+kubernetes_monitoring_victoria_default_rules_kubeapiserver: "true"
+kubernetes_monitoring_victoria_default_rules_kubeapiserveravailability: "true"
+kubernetes_monitoring_victoria_default_rules_kubeapiserverburnrate: "true"
+kubernetes_monitoring_victoria_default_rules_kubeapiserverhistogram: "true"
+kubernetes_monitoring_victoria_default_rules_kubeapiserverslos: "true"
+kubernetes_monitoring_victoria_default_rules_kubelet: "true"
+kubernetes_monitoring_victoria_default_rules_kubeprometheusgeneral: "true"
+kubernetes_monitoring_victoria_default_rules_kubeprometheusnoderecording: "true"
+kubernetes_monitoring_victoria_default_rules_kubernetesapps: "true"
+kubernetes_monitoring_victoria_default_rules_kubernetesresources: "true"
+kubernetes_monitoring_victoria_default_rules_kubernetesstorage: "true"
+kubernetes_monitoring_victoria_default_rules_kubernetessystem: "true"
+kubernetes_monitoring_victoria_default_rules_kubescheduler: "true"
+kubernetes_monitoring_victoria_default_rules_kubestatemetrics: "true"
+kubernetes_monitoring_victoria_default_rules_network: "true"
+kubernetes_monitoring_victoria_default_rules_node: "true"
+kubernetes_monitoring_victoria_default_rules_vmagent: "true"
+kubernetes_monitoring_victoria_default_rules_vmsingle: "true"
+kubernetes_monitoring_victoria_default_rules_vmhealth: "true"
+kubernetes_monitoring_victoria_default_rules_alertmanager: "true"
+kubernetes_monitoring_victoria_default_rules_runbook_url: "true"
+kubernetes_monitoring_victoria_default_dashboards_enabled: "true"
+
+
+### VMAgent
+
+kubernetes_monitoring_victoria_vmagent_enabled: "true"
+kubernetes_monitoring_victoria_vmagent_remote_write_url: "http://victoria-metrics-single:8429/api/v1/write"
+kubernetes_monitoring_victoria_vmagent_ingress_enabled: "false"
+kubernetes_monitoring_victoria_vmagent_ingress_class: ""
+kubernetes_monitoring_victoria_vmagent_ingress_cluster_issuer: ""
+kubernetes_monitoring_victoria_vmagent_ingress_host: ""
+
+
+### VMAlert
+
+kubernetes_monitoring_victoria_vmalert_enabled: "true"
+kubernetes_monitoring_victoria_vmalert_notifier_url: "http://alertmanager.monitoring.svc.cluster.local:9093"
+kubernetes_monitoring_victoria_vmalert_datasource_url: "http://victoria-metrics-single:8429"
+
+
+### VMCluster
+
+kubernetes_monitoring_victoria_vmcluster_enabled: "true"
+kubernetes_monitoring_victoria_retention_period: 14d
+kubernetes_monitoring_victoria_vmcluster_replication_factor: 
+kubernetes_monitoring_victoria_vmcluster_replica_count: 1
+kubernetes_monitoring_victoria_vmcluster_storage_size: 50gb
+kubernetes_monitoring_victoria_vmselect_replica_count: 1
+kubernetes_monitoring_victoria_vmselect_storage_size: 10gb
+kubernetes_monitoring_victoria_vminsert_replica_count: 1
+
+kubernetes_monitoring_victoria_vmcluster_ingress_storage_enabled: "true"
+kubernetes_monitoring_victoria_vmcluster_ingress_storage_host: "true"
+
+kubernetes_monitoring_victoria_vmcluster_ingress_select_enabled: "true"
+kubernetes_monitoring_victoria_vmcluster_ingress_select_host: "true"
+
+kubernetes_monitoring_victoria_vmcluster_ingress_insert_enabled: "true"
+kubernetes_monitoring_victoria_vmcluster_ingress_insert_host: "true"
+
+kubernetes_monitoring_victoria_operator_enabled: "true"
+
+
+### VMSingle
+
+kubernetes_monitoring_victoria_vmsingle_enabled: "true"
+kubernetes_monitoring_victoria_vmsingle_replica_count: 1
+kubernetes_monitoring_victoria_vmsingle_storage_size: 30gb
+kubernetes_monitoring_victoria_vmsingle_ingress_enabled: true
+kubernetes_monitoring_victoria_vmsingle_ingress_host: "{{ kubernetes_monitoring_vm_domain }}"
+kubernetes_monitoring_victoria_vmsingle_ingress_tls_secret_name: vmsingle-ingress-tls

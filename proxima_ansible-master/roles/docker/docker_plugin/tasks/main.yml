@@ -1,0 +1,4 @@
+---
+- name: Install/Remove docker plugins
+  include_tasks: plugins.yml
+  with_items: "{{ docker_plugins }}"

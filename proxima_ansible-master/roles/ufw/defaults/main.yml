@@ -1,0 +1,44 @@
+# defaults file
+---
+monitoring_server_ip: 65.21.248.225/32
+
+ufw_default_incoming_policy: deny
+ufw_default_outgoing_policy: allow
+
+ufw_logging: 'off'
+
+ufw_rules:
+  - rule: allow
+    interface: "{{ ansible_default_ipv4['interface'] }}"
+    to_port: 22
+    protocol: tcp
+  - rule: allow
+    interface: "{{ ansible_default_ipv4['interface'] }}"
+    to_port: 9100
+    from_ip: "{{ monitoring_server_ip }}"
+    protocol: tcp
+
+# https://github.com/chaifeng/ufw-docker#usage
+
+# docker run --name nginx -p 9090:80 -d nginx:latest
+# docker run --name nginx2 -p 9091:80 -d nginx:latest
+ufw_docker_rules:
+  - rule: 'ufw-docker allow docker-cadvisor 8080/tcp "{{ monitoring_server_ip }}" mon_network'  # allow connections from monitoring server to 8080 (cadvisor) port
+
+# /etc/default/ufw
+ufw_etc_default_ipv6: true
+ufw_etc_default_default_input_policy: DROP
+ufw_etc_default_default_output_policy: ACCEPT
+ufw_etc_default_default_forward_policy: DROP
+ufw_etc_default_default_application_policy: SKIP
+ufw_etc_default_manage_builtins: false
+ufw_etc_default_ipt_sysctl: /etc/ufw/sysctl.conf
+ufw_etc_default_ipt_modules:
+  - nf_conntrack_ftp
+  - nf_nat_ftp
+  - nf_conntrack_netbios_ns
+
+# https://github.com/chaifeng/ufw-docker/raw/master/ufw-docker
+ufw_docker_local_path: ufw-docker
+ufw_docker_path: /usr/local/bin/ufw-docker
+ufw_docker_install_cmd: 'ufw-docker install'

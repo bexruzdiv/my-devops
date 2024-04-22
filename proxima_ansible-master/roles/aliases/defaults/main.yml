@@ -1,0 +1,17 @@
+---
+is_used_zsh: true
+username: ubuntu
+aliases:
+  - dsls: docker service ls
+  - dsi: docker swarm init
+  - deit: docker exec -it "$1"
+  - dslogs: docker service logs "$1" -f
+  - ds: docker service "$1"
+  - dps: docker ps
+  - dpsall: docker ps -a
+  - drm: docker rm -f "$1"
+  - drmall: docker rm -f $(docker ps -aq)
+  - dimg: docker images
+  - drmi: docker rmi "$1"
+  - dprune: docker image prune --all
+  - dsc: docker service scale "$1"=1

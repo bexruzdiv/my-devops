@@ -1,0 +1,26 @@
+---
+
+docker_cadvisor_service_name: docker-cadvisor
+
+docker_cadvisor_systemd_service_path: /etc/systemd/system
+docker_cadvisor_systemd_service_name: "{{ docker_cadvisor_service_name }}"
+docker_cadvisor_systemd_service_template: docker-cadvisor.j2
+
+docker_cadvisor_container_name: "{{ docker_cadvisor_service_name }}"
+docker_cadvisor_publish_port: 8080
+docker_cadvisor_image_port: 8080
+docker_cadvisor_image_name: gcr.io/cadvisor/cadvisor
+docker_cadvisor_image_version: v0.47.0
+docker_cadvisor_docker_image: "{{ docker_cadvisor_image_name }}:{{ docker_cadvisor_image_version }}"
+docker_cadvisor_network: mon_network
+
+docker_cadvisor_root_path: /
+docker_cadvisor_root_path_in_docker: /rootfs
+docker_cadvisor_runtime_path: /var/run
+docker_cadvisor_runtime_path_in_docker: /var/run
+docker_cadvisor_system_path: /sys
+docker_cadvisor_system_path_in_docker: /sys
+docker_cadvisor_library_path: /var/lib/docker/
+docker_cadvisor_library_path_in_docker: /var/lib/docker
+docker_cadvisor_device_path: /dev/disk/
+docker_cadvisor_device_path_in_docker: /dev/disk

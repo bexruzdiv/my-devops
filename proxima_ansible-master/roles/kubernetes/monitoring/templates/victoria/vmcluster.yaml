@@ -1,0 +1,167 @@
+vmcluster:
+  enabled: {{ kubernetes_monitoring_victoria_vmcluster_enabled }}
+  annotations: {}
+  # spec for VMCluster crd
+  # https://docs.victoriametrics.com/operator/api.html#vmclusterspec
+  spec:
+    retentionPeriod: {{ kubernetes_monitoring_victoria_retention_period }}
+    replicationFactor: {{ kubernetes_monitoring_victoria_vmcluster_replication_factor }}
+    vmstorage:
+      # image:
+      #   tag: v1.92.1-cluster
+      nodeSelector:
+        {{ kubernetes_monitoring_node_label }}: "true"
+      replicaCount: {{ kubernetes_monitoring_victoria_vmcluster_replica_count }}
+      storageDataPath: "/vm-data"
+      storage:
+        volumeClaimTemplate:
+          spec:
+            resources:
+              requests:
+                storage: {{ kubernetes_monitoring_victoria_vmcluster_storage_size }}
+      resources:
+        {}
+        # limits:
+        #   cpu: "1"
+        #   memory: 1500Mi
+    vmselect:
+      # image:
+      #   tag: v1.92.1-cluster
+      nodeSelector:
+        {{ kubernetes_monitoring_node_label }}: "true"
+      replicaCount: {{ kubernetes_monitoring_victoria_vmselect_replica_count }}
+      cacheMountPath: "/select-cache"
+      extraArgs: {}
+      storage:
+        volumeClaimTemplate:
+          spec:
+            resources:
+              requests:
+                storage: {{ kubernetes_monitoring_victoria_vmselect_storage_size }}
+      resources:
+        {}
+        # limits:
+        #   cpu: "1"
+        #   memory: "1000Mi"
+        # requests:
+        #   cpu: "0.5"
+        #   memory: "500Mi"
+    vminsert:
+      # image:
+      #   tag: v1.92.1-cluster
+      nodeSelector:
+        {{ kubernetes_monitoring_node_label }}: "true"
+      replicaCount: {{ kubernetes_monitoring_victoria_vminsert_replica_count }}
+      extraArgs: {}
+      resources:
+        {}
+        # limits:
+        #   cpu: "1"
+        #   memory: 1000Mi
+        # requests:
+        #   cpu: "0.5"
+        #   memory: "500Mi"
+
+  ingress:
+    storage:
+      enabled: {{ kubernetes_monitoring_victoria_vmcluster_ingress_storage_enabled }}
+      # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+      # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+      # ingressClassName: nginx
+      # Values can be templated
+      annotations:
+        kubernetes.io/ingress.class: {{ kubernetes_monitoring_ingress_class }}
+        cert-manager.io/cluster-issuer: {{ kubernetes_monitoring_ingress_cluster_issuer }}
+      labels: {}
+      path: /
+      # pathType is only for k8s > 1.19
+      pathType: Prefix
+
+      hosts:
+        - {{ kubernetes_monitoring_victoria_vmcluster_ingress_storage_host }}
+      ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+      extraPaths: []
+      # - path: /*
+      #   backend:
+      #     serviceName: ssl-redirect
+      #     servicePort: use-annotation
+      ## Or for k8s > 1.19
+      # - path: /*
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: ssl-redirect
+      #       port:
+      #         name: service
+      tls:
+        - secretName: vmstorage-ingress-tls
+          hosts:
+            - {{ kubernetes_monitoring_victoria_vmcluster_ingress_storage_host }}
+    select:
+      enabled: {{ kubernetes_monitoring_victoria_vmcluster_ingress_select_enabled }}
+      # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+      # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+      # ingressClassName: nginx
+      # Values can be templated
+      annotations:
+        kubernetes.io/ingress.class: {{ kubernetes_monitoring_ingress_class }}
+        cert-manager.io/cluster-issuer: {{ kubernetes_monitoring_ingress_cluster_issuer }}
+      labels: {}
+      path: /
+      # pathType is only for k8s > 1.19
+      pathType: Prefix
+
+      hosts:
+        - {{ kubernetes_monitoring_victoria_vmcluster_ingress_select_host }}
+      ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+      extraPaths: []
+      # - path: /*
+      #   backend:
+      #     serviceName: ssl-redirect
+      #     servicePort: use-annotation
+      ## Or for k8s > 1.19
+      # - path: /*
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: ssl-redirect
+      #       port:
+      #         name: service
+      tls:
+        - secretName: vmselect-ingress-tls
+          hosts:
+            - {{ kubernetes_monitoring_victoria_vmcluster_ingress_select_host }}
+    insert:
+      enabled: {{ kubernetes_monitoring_victoria_vmcluster_ingress_insert_enabled }}
+      # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+      # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+      # ingressClassName: nginx
+      # Values can be templated
+      annotations:
+        kubernetes.io/ingress.class: {{ kubernetes_monitoring_ingress_class }}
+        cert-manager.io/cluster-issuer: {{ kubernetes_monitoring_ingress_cluster_issuer }}
+      labels: {}
+      path: /
+      # pathType is only for k8s > 1.19
+      pathType: Prefix
+
+      hosts:
+        - {{ kubernetes_monitoring_victoria_vmcluster_ingress_insert_host }}
+      ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+      extraPaths: []
+      # - path: /*
+      #   backend:
+      #     serviceName: ssl-redirect
+      #     servicePort: use-annotation
+      ## Or for k8s > 1.19
+      # - path: /*
+      #   pathType: Prefix
+      #   backend:
+      #     service:
+      #       name: ssl-redirect
+      #       port:
+      #         name: service
+      tls:
+        - secretName: vminsert-ingress-tls
+          hosts:
+            - {{ kubernetes_monitoring_victoria_vmcluster_ingress_insert_host }}

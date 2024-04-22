@@ -1,0 +1,48 @@
+---
+
+sudo_config_file_path: /etc/sudoers
+sudo_config_dir_path: /etc/sudoers.d
+
+sudo_user_aliases:
+  METRICS:
+    - telegraf
+sudo_host_aliases: {}
+sudo_runas_aliases: {}
+sudo_command_aliases:
+  METRICS:
+    - /usr/sbin/smartctl -i *
+    - /usr/sbin/smartctl -a *
+    - /usr/sbin/smartctl -H *
+    - /usr/bin/raid-stats
+    - /usr/bin/ipmitool sdr *
+    - /usr/sbin/hpssacli controller all show config
+    - /usr/sbin/hpacucli controller all show config
+
+sudo_requiretty_enabled: false
+sudo_visiblepw_enabled: false
+sudo_always_set_home_enabled: false
+
+sudo_syslog_enabled: true
+sudo_syslog_facility: authpriv
+sudo_syslog_exclude_users:
+  - METRICS
+
+sudo_secure_path: /sbin:/bin:/usr/sbin:/usr/bin
+
+sudo_rules_basic:
+  - user: root
+
+  - user: '%sudo'
+    password: false
+
+  - user: METRICS
+    commands:
+      - METRICS
+    password: false
+
+sudo_rules: []
+sudo_env_keep_list: []
+
+sudo_custom: ''
+
+sudo_validate_command: /usr/sbin/visudo -cf %s

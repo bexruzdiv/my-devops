@@ -1,0 +1,21 @@
+---
+docker_network:
+  - name: docker_network
+    state: present
+    driver: bridge
+
+promtail:
+  image: grafana/promtail:latest
+  loki_path: http://65.109.160.170:3100/loki/api/v1/push
+  networks:
+    - docker_network
+  external_port: 9100
+  additional_volumes: []
+    # - /home/ebs/sites/shipox/shopify/logs:/var/log/shopify:ro
+  configs:
+    - job_name: 
+      targets:
+        - localhost
+      labels:
+        job: varlogs
+      path: /var/log/postgresql/*log

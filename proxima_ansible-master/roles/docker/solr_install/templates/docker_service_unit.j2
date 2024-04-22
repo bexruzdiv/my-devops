@@ -1,0 +1,34 @@
+[Unit]
+Description=Docker Service for solr
+After=network.service docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop -t 60 solr
+ExecStartPre=-/usr/bin/docker rm solr
+ExecStart=/usr/bin/docker run \
+--rm \
+--name solr \
+--volume 'solr:/bitnami' \
+--env 'SOLR_ADMIN_USERNAME=solr' \
+--env 'SOLR_ADMIN_PASSWORD=solr' \
+--publish {{ solr.external_port }}:8983 \
+{% if solr.networks is defined %}
+{% for network in solr.networks %}
+--network {{ network }} \
+{% endfor %}
+{% endif %}
+--log-driver 'syslog' \
+--log-opt 'tag=solr' \
+{{ solr.image }}
+
+ExecReload=/usr/bin/docker restart 'solr'
+
+Restart=always
+RestartSec=20s
+
+SuccessExitStatus=SIGKILL SIGTERM 143 137
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service

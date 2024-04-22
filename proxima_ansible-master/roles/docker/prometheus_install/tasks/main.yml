@@ -1,0 +1,8 @@
+---
+# tasks file for docker_run
+- name: Create docker network
+  include_tasks: create_network.yml
+  with_items: "{{ docker_network }}"
+
+- name: Create docker service
+  include_tasks: create_docker_service.yml

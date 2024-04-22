@@ -1,0 +1,9 @@
+---
+
+- name: Create the home directory
+  file:
+    path: "{{ users_home_directory }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755

@@ -1,0 +1,56 @@
+---
+- name: Configure Kubernetes Node
+  hosts: localhost
+  become: true
+  vars:
+    NODENAME: "{{ ansible_hostname | regex_replace('-', '') }}"  
+    POD_CIDR: "192.168.0.0/16"
+    
+
+  tasks:
+    - name: Display Node Information
+      debug:
+        msg: "Node Name: {{ NODENAME }}, Pod CIDR: {{ POD_CIDR }}"
+
+    - name: Run kubeadm config images pull
+      command: "sudo kubeadm config images pull"
+
+    - name: Get Master Public IP
+      shell: "curl ifconfig.me && echo ''"
+      register: master_public_ip_result
+
+    - name: Display Master Public IP
+      debug:
+        var: master_public_ip_result.stdout
+
+    - name: Run kubeadm init
+      command: "sudo kubeadm init --control-plane-endpoint={{ master_public_ip_result.stdout }} --apiserver-cert-extra-sans={{ master_public_ip_result.stdout }} --pod-network-cidr={{ POD_CIDR }} --node-name {{ NODENAME }} --ignore-preflight-errors Swap"
+
+    - name: Create ~/.kube directory
+      command: mkdir -p "{{ ansible_env.HOME }}"/.kube
+
+    - name: Copy admin.conf to ~/.kube/config
+      ansible.builtin.copy:
+        src: /etc/kubernetes/admin.conf
+        dest: "{{ ansible_env.HOME }}/.kube/config"
+        remote_src: yes
+        owner: "{{ ansible_env.USER }}"
+        group: "{{ ansible_env.USER }}"
+        mode: '0600'
+
+    - name: Create Calico Operator
+      shell: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/tigera-operator.yaml
+
+    - name: Download Calico Custom Resources Manifest
+      shell: curl https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/custom-resources.yaml -o ~/custom-resources.yaml
+
+    - name: Apply Calico Custom Resources
+      shell: kubectl create -f ~/custom-resources.yaml
+
+    - name: Generate Master Token
+      shell: "sudo kubeadm token create --print-join-command > master-token"
+
+
+
+
+

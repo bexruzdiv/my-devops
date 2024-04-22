@@ -1,0 +1,96 @@
+base_url: {{ kubernetes_monitoring_oncall_base_url }}
+
+# Change grafana cloud oncall api url if needed
+env:
+  GRAFANA_CLOUD_ONCALL_API_URL: {{ kubernetes_monitoring_oncall_grafana_cloud_oncall_api_url }}
+
+nodeSelector: 
+  {{ kubernetes_monitoring_node_label }}: "true"
+
+celery:
+  nodeSelector: 
+    {{ kubernetes_monitoring_node_label }}: "true"
+
+oncall:
+  telegram:
+    enabled: {{ kubernetes_monitoring_oncall_telegram_enabled }}
+    token: {{ kubernetes_monitoring_oncall_telegram_token }}
+    webhookUrl: {{ kubernetes_monitoring_oncall_telegram_webhook_url }}
+  smtp:
+    enabled: {{ kubernetes_monitoring_grafana_smtp_enabled }}
+    host: {{ kubernetes_monitoring_grafana_smtp_host }}
+    port: {{ kubernetes_monitoring_grafana_smtp_port }}
+    username: {{ kubernetes_monitoring_grafana_smtp_user }}
+    password: {{ kubernetes_monitoring_grafana_smtp_password }}
+    tls: {{ kubernetes_monitoring_grafana_smtp_tls }}
+    fromEmail: {{ kubernetes_monitoring_grafana_smtp_from_address }}
+  twilio:
+    accountSid: {{ kubernetes_monitoring_oncall_twilio_account_sid }}
+    authToken: {{ kubernetes_monitoring_oncall_twilio_auth_token }}
+    phoneNumber: {{ kubernetes_monitoring_oncall_twilio_phone_number }}
+    verifySid: {{ kubernetes_monitoring_oncall_twilio_verify_sid }}
+    apiKeySid: {{ kubernetes_monitoring_oncall_twilio_api_key_sid }}
+    apiKeySecret: {{ kubernetes_monitoring_oncall_twilio_api_key_secret }}
+
+migrate:
+  nodeSelector: 
+    {{ kubernetes_monitoring_node_label }}: "true"
+
+ingress:
+  enabled: {{ kubernetes_monitoring_oncall_ingress_enabled }}
+  annotations:
+    kubernetes.io/ingress.class: {{ kubernetes_monitoring_ingress_class }}
+    cert-manager.io/cluster-issuer: {{ kubernetes_monitoring_ingress_cluster_issuer }}
+  tls:
+    - hosts:
+        - {{ kubernetes_monitoring_oncall_base_url }}
+      secretName: grafana-oncall-tls
+
+database:
+  type: {{ kubernetes_monitoring_oncall_database_type }}
+
+externalPostgresql:
+  host: {{ kubernetes_monitoring_oncall_database_host }}
+  port: {{ kubernetes_monitoring_oncall_database_port }}
+  db_name: {{ kubernetes_monitoring_oncall_database_name }}
+  user: {{ kubernetes_monitoring_oncall_database_user }}
+  password: {{ kubernetes_monitoring_oncall_database_password }}
+
+broker:
+  type: rabbitmq
+
+externalRabbitmq:
+  host: {{ kubernetes_monitoring_oncall_rabbitmq_host }}
+  port: {{ kubernetes_monitoring_oncall_rabbitmq_port }} 
+  user: {{ kubernetes_monitoring_oncall_rabbitmq_user }}
+  password: {{ kubernetes_monitoring_oncall_rabbitmq_password }}
+  protocol: {{ kubernetes_monitoring_oncall_rabbitmq_protocol }}
+  vhost: {{ kubernetes_monitoring_oncall_rabbitmq_vhost }}
+
+externalRedis:
+  host: {{ kubernetes_monitoring_oncall_redis_host }}
+  password: {{ kubernetes_monitoring_oncall_redis_password }}
+
+externalGrafana:
+  url: {{ kubernetes_monitoring_oncall_grafana_url }}
+
+ingress-nginx:
+  enabled: false
+
+cert-manager:
+  enabled: false
+
+mariadb:
+  enabled: false
+
+postgresql:
+  enabled: false
+
+rabbitmq:
+  enabled: false
+
+redis:
+  enabled: false
+
+grafana:
+  enabled: false

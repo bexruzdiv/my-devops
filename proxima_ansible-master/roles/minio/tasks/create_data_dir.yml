@@ -1,0 +1,6 @@
+- name: Create MinIO data directory
+  file:
+    path: "{{ minio_volume_path }}"
+    state: directory
+    mode: 755 
+

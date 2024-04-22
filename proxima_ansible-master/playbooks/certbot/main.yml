@@ -1,0 +1,8 @@
+---
+- name: "Generate SSL certificates with certbot"
+  hosts: "{{ hostname }}"
+  gather_facts: no
+  become: yes
+
+  roles:
+    - role: certbot

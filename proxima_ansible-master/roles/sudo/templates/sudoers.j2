@@ -1,0 +1,101 @@
+{{ ansible_template_banner|default('') }}
+
+# ALIASES #
+
+# User aliases #
+{% for alias, list in sudo_user_aliases.items() %}
+User_Alias {{ alias|upper }} = {{ list|to_list|join(', ') }}
+{% endfor %}
+
+# Host aliases #
+{% for alias, list in sudo_host_aliases.items() %}
+Host_Alias {{ alias|upper }} = {{ list|to_list|join(', ') }}
+{% endfor %}
+
+# Runas aliases #
+{% for alias, list in sudo_runas_aliases.items() %}
+Runas_Alias {{ alias|upper }} = {{ list|to_list|join(', ') }}
+{% endfor %}
+
+# Command aliases #
+{% for alias, list in sudo_command_aliases.items() %}
+Cmnd_Alias {{ alias|upper }} = {{ list|to_list|join(', ') }}
+{% endfor %}
+
+# DEFAULTS #
+
+# Disable "ssh hostname sudo <cmd>", because it will show the password in clear.
+# You have to run "ssh -t hostname sudo <cmd>".
+{% if sudo_requiretty_enabled|bool %}
+Defaults requiretty
+{% else %}
+Defaults !requiretty
+{% endif %}
+
+# Refuse to run if unable to disable echo on the tty. This setting should also be
+# changed in order to be able to use sudo without a tty. See requiretty above.
+{% if sudo_visiblepw_enabled|bool %}
+Defaults visiblepw
+{% else %}
+Defaults !visiblepw
+{% endif %}
+
+# Preserving HOME has security implications since many programs
+# use it when searching for configuration files. Note that HOME
+# is already set when the the env_reset option is enabled, so
+# this option is only effective for configurations where either
+# env_reset is disabled or HOME is present in the env_keep list.
+{% if sudo_always_set_home_enabled|bool %}
+Defaults always_set_home
+{% else %}
+Defaults !always_set_home
+{% endif %}
+
+# Syslog facility if syslog is being used for logging (negate to disable syslog logging).
+# Defaults to authpriv
+# The following syslog facilities are supported: authpriv (if your OS supports it),
+# auth, daemon, user, local0, local1, local2, local3, local4, local5, local6, and local7.
+{% if sudo_syslog_enabled|bool %}
+Defaults syslog={{ sudo_syslog_facility }}
+{% else %}
+Defaults !syslog
+{% endif %}
+{% for user in sudo_syslog_exclude_users|to_list %}
+Defaults:{{ user }} !syslog
+{% endfor %}
+
+# Reset all environment variables, but keep some terminal and locale related ones.
+Defaults env_reset
+Defaults env_keep =  "COLORS DISPLAY HOSTNAME HISTSIZE INPUTRC KDEDIR LS_COLORS"
+Defaults env_keep += "MAIL PS1 PS2 QTDIR USERNAME LANG LC_ADDRESS LC_CTYPE"
+Defaults env_keep += "LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES"
+Defaults env_keep += "LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE"
+Defaults env_keep += "LC_TIME LC_ALL LANGUAGE LINGUAS _XKB_CHARSET XAUTHORITY"
+Defaults env_keep += "HTTP_PROXY HTTPS_PROXY FTP_PROXY ALL_PROXY NO_PROXY"
+Defaults env_keep += "http_proxy https_proxy ftp_proxy all_proxy no_proxy"
+{% if sudo_env_keep_list|to_list|length > 0 %}
+Defaults env_keep += "{{ sudo_env_keep_list|to_list|join(' ') }}"
+{% endif %}
+
+# Adding HOME to env_keep may enable a user to run unrestricted commands via sudo.
+Defaults env_keep += "HOME"
+
+# Set this PATH environment for the commands you run using sudo
+Defaults secure_path = {{ sudo_secure_path }}
+
+# RULES #
+
+{% for rule in (sudo_rules_basic|to_list + sudo_rules|to_list) %}
+{{ rule.user }} {{ rule.hosts|default('ALL') }} = ({{ rule.runas|default('ALL') }}) {{ rule.password|default(True)|bool|ternary('PASSWD:','NOPASSWD:') }} {{ rule.commands|default('ALL')|to_list|join(', ') }}
+{% endfor %}
+
+# INCLUDES #
+
+{% if sudo_custom %}
+# Custom configuration #
+
+{{ sudo_custom }}
+{% endif %}
+
+# Read drop-in files from /etc/sudoers.d (the # here does not mean a comment)
+#includedir {{ sudo_config_dir_path }}

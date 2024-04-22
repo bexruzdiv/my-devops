@@ -1,0 +1,18 @@
+---
+
+- import_tasks: root.yml
+  tags:
+    - users_root
+    - users
+
+- import_tasks: home.yml
+  tags:
+    - users_home
+    - users
+
+- name: "Process users"
+  include: user.yml
+  loop_control:
+    loop_var: user
+  with_items: "{{ users_list_basic + users_list }}"
+  when: (not 'hosts' in user) or (inventory_hostname in user.hosts) or (group_names|intersect(user.hosts))

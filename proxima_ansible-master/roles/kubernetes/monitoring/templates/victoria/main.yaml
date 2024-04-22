@@ -1,0 +1,7 @@
+{% include "vmoperator.yaml" | from_yaml %} 
+{% include "default-rules.yaml" | from_yaml %}
+{% include "vmsingle.yaml" | from_yaml %}
+{% include "vmcluster.yaml" | from_yaml %}
+{% include "vmagent.yaml" | from_yaml %}
+{% include "vmalert.yaml" | from_yaml %}
+{% include "service-monitors.yaml" | from_yaml %}

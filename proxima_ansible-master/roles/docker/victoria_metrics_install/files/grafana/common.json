@@ -1,0 +1,850 @@
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "target": {
+            "limit": 100,
+            "matchAny": false,
+            "tags": [],
+            "type": "dashboard"
+          },
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 16,
+    "links": [],
+    "liveNow": false,
+    "panels": [
+      {
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "id": 4,
+        "panels": [],
+        "title": "CPU | Shipox Prod Apps",
+        "type": "row"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "P4169E866C3094E38"
+        },
+        "description": "Busy state of all CPU cores together",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [
+              {
+                "options": {
+                  "match": "null",
+                  "result": {
+                    "text": "N/A"
+                  }
+                },
+                "type": "special"
+              }
+            ],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "rgba(50, 172, 45, 0.97)",
+                  "value": null
+                },
+                {
+                  "color": "rgba(237, 129, 40, 0.89)",
+                  "value": 85
+                },
+                {
+                  "color": "rgba(245, 54, 54, 0.9)",
+                  "value": 95
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 4,
+          "x": 0,
+          "y": 1
+        },
+        "id": 20,
+        "links": [],
+        "options": {
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "pluginVersion": "9.2.7",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "P4169E866C3094E38"
+            },
+            "editorMode": "code",
+            "expr": "(sum by(instance) (irate(node_cpu_seconds_total{instance=\"Shipox-Prod-App1\",job=\"shipox_prod_app\", mode!=\"idle\"}[1m0s])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"Shipox-Prod-App1\",job=\"shipox_prod_app\"}[1m0s])))) * 100",
+            "hide": false,
+            "intervalFactor": 1,
+            "legendFormat": "",
+            "range": true,
+            "refId": "A",
+            "step": 240
+          }
+        ],
+        "title": "Shipox-Prod-App1",
+        "type": "gauge"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "P4169E866C3094E38"
+        },
+        "description": "Busy state of all CPU cores together",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [
+              {
+                "options": {
+                  "match": "null",
+                  "result": {
+                    "text": "N/A"
+                  }
+                },
+                "type": "special"
+              }
+            ],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "rgba(50, 172, 45, 0.97)",
+                  "value": null
+                },
+                {
+                  "color": "rgba(237, 129, 40, 0.89)",
+                  "value": 85
+                },
+                {
+                  "color": "rgba(245, 54, 54, 0.9)",
+                  "value": 95
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 4,
+          "x": 4,
+          "y": 1
+        },
+        "id": 21,
+        "links": [],
+        "options": {
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "pluginVersion": "9.2.7",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "P4169E866C3094E38"
+            },
+            "editorMode": "code",
+            "expr": "(sum by(instance) (irate(node_cpu_seconds_total{instance=\"Shipox-Prod-App2\",job=\"shipox_prod_app\", mode!=\"idle\"}[1m0s])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"Shipox-Prod-App2\",job=\"shipox_prod_app\"}[1m0s])))) * 100",
+            "hide": false,
+            "intervalFactor": 1,
+            "legendFormat": "",
+            "range": true,
+            "refId": "A",
+            "step": 240
+          }
+        ],
+        "title": "Shipox-Prod-App2",
+        "type": "gauge"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "P4169E866C3094E38"
+        },
+        "description": "Busy state of all CPU cores together",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [
+              {
+                "options": {
+                  "match": "null",
+                  "result": {
+                    "text": "N/A"
+                  }
+                },
+                "type": "special"
+              }
+            ],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "rgba(50, 172, 45, 0.97)",
+                  "value": null
+                },
+                {
+                  "color": "rgba(237, 129, 40, 0.89)",
+                  "value": 85
+                },
+                {
+                  "color": "rgba(245, 54, 54, 0.9)",
+                  "value": 95
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 4,
+          "x": 8,
+          "y": 1
+        },
+        "id": 22,
+        "links": [],
+        "options": {
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "pluginVersion": "9.2.7",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "P4169E866C3094E38"
+            },
+            "editorMode": "code",
+            "expr": "(sum by(instance) (irate(node_cpu_seconds_total{instance=\"Shipox-Prod-App3\",job=\"shipox_prod_app\", mode!=\"idle\"}[1m0s])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"Shipox-Prod-App3\",job=\"shipox_prod_app\"}[1m0s])))) * 100",
+            "hide": false,
+            "intervalFactor": 1,
+            "legendFormat": "",
+            "range": true,
+            "refId": "A",
+            "step": 240
+          }
+        ],
+        "title": "Shipox-Prod-App3",
+        "type": "gauge"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "P4169E866C3094E38"
+        },
+        "description": "Busy state of all CPU cores together",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [
+              {
+                "options": {
+                  "match": "null",
+                  "result": {
+                    "text": "N/A"
+                  }
+                },
+                "type": "special"
+              }
+            ],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "rgba(50, 172, 45, 0.97)",
+                  "value": null
+                },
+                {
+                  "color": "rgba(237, 129, 40, 0.89)",
+                  "value": 85
+                },
+                {
+                  "color": "rgba(245, 54, 54, 0.9)",
+                  "value": 95
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 4,
+          "x": 12,
+          "y": 1
+        },
+        "id": 23,
+        "links": [],
+        "options": {
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "pluginVersion": "9.2.7",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "P4169E866C3094E38"
+            },
+            "editorMode": "code",
+            "expr": "(sum by(instance) (irate(node_cpu_seconds_total{instance=\"Shipox-Prod-App4\",job=\"shipox_prod_app\", mode!=\"idle\"}[1m0s])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"Shipox-Prod-App4\",job=\"shipox_prod_app\"}[1m0s])))) * 100",
+            "hide": false,
+            "intervalFactor": 1,
+            "legendFormat": "",
+            "range": true,
+            "refId": "A",
+            "step": 240
+          }
+        ],
+        "title": "Shipox-Prod-App4",
+        "type": "gauge"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "P4169E866C3094E38"
+        },
+        "description": "Busy state of all CPU cores together",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [
+              {
+                "options": {
+                  "match": "null",
+                  "result": {
+                    "text": "N/A"
+                  }
+                },
+                "type": "special"
+              }
+            ],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "rgba(50, 172, 45, 0.97)",
+                  "value": null
+                },
+                {
+                  "color": "rgba(237, 129, 40, 0.89)",
+                  "value": 85
+                },
+                {
+                  "color": "rgba(245, 54, 54, 0.9)",
+                  "value": 95
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 4,
+          "x": 16,
+          "y": 1
+        },
+        "id": 24,
+        "links": [],
+        "options": {
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "pluginVersion": "9.2.7",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "P4169E866C3094E38"
+            },
+            "editorMode": "code",
+            "expr": "(sum by(instance) (irate(node_cpu_seconds_total{instance=\"Shipox-Prod-App5\",job=\"shipox_prod_app\", mode!=\"idle\"}[1m0s])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=\"Shipox-Prod-App5\",job=\"shipox_prod_app\"}[1m0s])))) * 100",
+            "hide": false,
+            "intervalFactor": 1,
+            "legendFormat": "",
+            "range": true,
+            "refId": "A",
+            "step": 240
+          }
+        ],
+        "title": "Shipox-Prod-App5",
+        "type": "gauge"
+      },
+      {
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 5
+        },
+        "id": 28,
+        "panels": [],
+        "title": "RAM | Shipox Prod Apps",
+        "type": "row"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "P4169E866C3094E38"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+              "mode": "percentage",
+              "steps": [
+                {
+                  "color": "rgba(50, 172, 45, 0.97)",
+                  "value": null
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 80
+                },
+                {
+                  "color": "red",
+                  "value": 90
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 4,
+          "x": 0,
+          "y": 6
+        },
+        "id": 26,
+        "options": {
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "pluginVersion": "9.2.7",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "P4169E866C3094E38"
+            },
+            "editorMode": "code",
+            "expr": "100 - ((node_memory_MemAvailable_bytes{instance=\"Shipox-Prod-App1\",job=\"shipox_prod_app\"} * 100) / node_memory_MemTotal_bytes{instance=\"Shipox-Prod-App1\",job=\"shipox_prod_app\"})",
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A"
+          }
+        ],
+        "title": "Shipox-Prod-App1",
+        "type": "gauge"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "P4169E866C3094E38"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+              "mode": "percentage",
+              "steps": [
+                {
+                  "color": "rgba(50, 172, 45, 0.97)",
+                  "value": null
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 80
+                },
+                {
+                  "color": "red",
+                  "value": 90
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 4,
+          "x": 4,
+          "y": 6
+        },
+        "id": 29,
+        "options": {
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "pluginVersion": "9.2.7",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "P4169E866C3094E38"
+            },
+            "editorMode": "code",
+            "expr": "100 - ((node_memory_MemAvailable_bytes{instance=\"Shipox-Prod-App2\",job=\"shipox_prod_app\"} * 100) / node_memory_MemTotal_bytes{instance=\"Shipox-Prod-App2\",job=\"shipox_prod_app\"})",
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A"
+          }
+        ],
+        "title": "Shipox-Prod-App2",
+        "type": "gauge"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "P4169E866C3094E38"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+              "mode": "percentage",
+              "steps": [
+                {
+                  "color": "rgba(50, 172, 45, 0.97)",
+                  "value": null
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 80
+                },
+                {
+                  "color": "red",
+                  "value": 90
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 4,
+          "x": 8,
+          "y": 6
+        },
+        "id": 30,
+        "options": {
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "pluginVersion": "9.2.7",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "P4169E866C3094E38"
+            },
+            "editorMode": "code",
+            "expr": "100 - ((node_memory_MemAvailable_bytes{instance=\"Shipox-Prod-App3\",job=\"shipox_prod_app\"} * 100) / node_memory_MemTotal_bytes{instance=\"Shipox-Prod-App3\",job=\"shipox_prod_app\"})",
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A"
+          }
+        ],
+        "title": "Shipox-Prod-App3",
+        "type": "gauge"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "P4169E866C3094E38"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+              "mode": "percentage",
+              "steps": [
+                {
+                  "color": "rgba(50, 172, 45, 0.97)",
+                  "value": null
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 80
+                },
+                {
+                  "color": "red",
+                  "value": 90
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 4,
+          "x": 12,
+          "y": 6
+        },
+        "id": 32,
+        "options": {
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "pluginVersion": "9.2.7",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "P4169E866C3094E38"
+            },
+            "editorMode": "code",
+            "expr": "100 - ((node_memory_MemAvailable_bytes{instance=\"Shipox-Prod-App4\",job=\"shipox_prod_app\"} * 100) / node_memory_MemTotal_bytes{instance=\"Shipox-Prod-App4\",job=\"shipox_prod_app\"})",
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A"
+          }
+        ],
+        "title": "Shipox-Prod-App4",
+        "type": "gauge"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "P4169E866C3094E38"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "max": 100,
+            "min": 0,
+            "thresholds": {
+              "mode": "percentage",
+              "steps": [
+                {
+                  "color": "rgba(50, 172, 45, 0.97)",
+                  "value": null
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 80
+                },
+                {
+                  "color": "red",
+                  "value": 90
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 4,
+          "w": 4,
+          "x": 16,
+          "y": 6
+        },
+        "id": 31,
+        "options": {
+          "orientation": "auto",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showThresholdLabels": false,
+          "showThresholdMarkers": true
+        },
+        "pluginVersion": "9.2.7",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "P4169E866C3094E38"
+            },
+            "editorMode": "code",
+            "expr": "100 - ((node_memory_MemAvailable_bytes{instance=\"Shipox-Prod-App5\",job=\"shipox_prod_app\"} * 100) / node_memory_MemTotal_bytes{instance=\"Shipox-Prod-App5\",job=\"shipox_prod_app\"})",
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A"
+          }
+        ],
+        "title": "Shipox-Prod-App5",
+        "type": "gauge"
+      }
+    ],
+    "refresh": "5s",
+    "schemaVersion": 37,
+    "style": "dark",
+    "tags": [],
+    "templating": {
+      "list": []
+    },
+    "time": {
+      "from": "now-5m",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "Common",
+    "uid": "tEXrmtY4z",
+    "version": 3,
+    "weekStart": ""
+  }

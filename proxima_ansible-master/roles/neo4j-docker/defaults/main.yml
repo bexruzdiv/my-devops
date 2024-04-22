@@ -1,0 +1,21 @@
+docker_neo4j_port: 7474
+docker_neo4j_port2: 7687
+docker_neo4j_root_password: neo4j/Jeecilierai7theith6e
+docker_neo4j_container_name: neo4jdatabase
+docker_neo4j_data_volume: /var/data/neo4j/neo4jdatabase
+docker_neo4j_data_volume_in_docker: /var/lib/neo4j/data
+docker_neo4j_data_logs: /var/data/neo4j/logs
+docker_neo4j_data_logs_in_docker: /var/lib/neo4j/data/logs
+docker_neo4j_data_import: /var/data/neo4j/import
+docker_neo4j_data_import_in_docker: /var/lib/neo4j/data/import
+docker_neo4j_data_plugins: /var/data/neo4j/plugins
+docker_neo4j_data_plugins_in_docker: /var/lib/neo4j/data/plugins
+docker_neo4j_systemd_service_template: neo4jdb.service.j2
+docker_neo4j_systemd_service_path: /etc/systemd/system
+docker_neo4j_image_name: neo4j
+docker_neo4j_image_version: 3.5
+docker_neo4j_docker_image: "{{ docker_neo4j_image_name }}:{{ docker_neo4j_image_version }}"
+
+docker_neo4j_systemd_config_template: file/neo4j.conf
+docker_neo4j_systemd_config_in_docker: /etc/neo4j.conf
+docker_neo4j_systemd_service_name: neo4jdatabase.service

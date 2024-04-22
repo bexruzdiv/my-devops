@@ -1,0 +1,22 @@
+{{ define "telegram" }}
+    {{ if gt (len .Alerts.Firing) 0 }}
+{{- len .Alerts.Firing }} alert(s)
+        {{- range .Alerts.Firing }} 
+❌ <u><b>{{ .Labels.alertname }}</b></u>
+{{ .Annotations.message }}
+{{ .Labels.job }}
+{{ .Labels.instance }}
+        {{ end }}
+    {{ end }}
+    {{ if gt (len .Alerts.Resolved) 0 }}
+{{- len .Alerts.Resolved }} alert(s)
+        {{- range .Alerts.Resolved }} 
+✅<u><b>{{ .Labels.alertname }}</b></u> 
+{{ .Labels.job }}
+{{ .Labels.instance }}
+<b>Starts at: </b> {{ .StartsAt }}
+<b>Ends at: </b> {{ .EndsAt }}
+<b>Duration: </b> {{(.EndsAt.Sub .StartsAt).Truncate 1000000000}}
+        {{ end }}
+    {{ end }}
+{{ end }} 

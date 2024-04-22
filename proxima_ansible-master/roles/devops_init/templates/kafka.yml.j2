@@ -1,0 +1,9 @@
+version: "{{ docker_compose_version }}"
+
+services:
+  kafka:
+    image: 'bitnami/kafka:{{ kafka.version }}'
+    ports:
+      - '{{ kafka.external_port }}:9092'
+    environment:
+      - ALLOW_PLAINTEXT_LISTENER=yes

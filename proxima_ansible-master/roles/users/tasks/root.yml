@@ -1,0 +1,19 @@
+---
+
+- name: Ensure group "sudo" exists
+  group:
+    name: sudo
+    state: present
+
+- name: "Setup the root user"
+  user:
+    name: root
+    group: root
+    groups: []
+    shell: /bin/bash
+    password: '{{ users_root_password_hash|string }}'
+    comment: "Root User"
+    uid: 0
+    createhome: yes
+    home: /root
+    force: true

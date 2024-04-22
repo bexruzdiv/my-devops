@@ -1,0 +1,43 @@
+[Unit]
+Description=Docker Service for {{ vmagent.name }}
+After=network.service docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop -t 60 {{ vmagent.name }}
+ExecStartPre=-/usr/bin/docker rm {{ vmagent.name }}
+ExecStart=/usr/bin/docker run \
+--rm \
+--name {{ vmagent.name }} \
+--publish {{ vmagent.port }}:8429 \
+-v vmagentdata:/vmagentdata \
+-v /etc/victoriametrics/prometheus.yml:/etc/prometheus/prometheus.yml \
+{% if vmagent.networks is defined %}
+{% for network in vmagent.networks %}
+--network {{ network }} \
+{% endfor %}
+{% endif %}
+{% if vmagent.extra_hosts is defined %}
+{% for host in vmagent.extra_hosts %}
+--add-host {{ host.name }}:{{ host.ip }} \
+{% endfor %}
+{% endif %}
+--log-driver 'syslog' \
+--log-opt 'tag={{ vmagent.name }}' \
+{{ vmagent.image }} \
+--promscrape.config=/etc/prometheus/prometheus.yml \
+--promscrape.config.strictParse=false \
+--remoteWrite.url=http://{{ victoriametrics.name }}:8428/api/v1/write 
+ExecStop=-/usr/bin/docker stop -t 60 {{ vmagent.name }}
+
+ExecReload=/usr/bin/docker restart '{{ vmagent.name }}'
+
+Restart=always
+RestartSec=20s
+
+SuccessExitStatus=SIGKILL SIGTERM 143 137
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service
+

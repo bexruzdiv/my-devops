@@ -1,0 +1,60 @@
+---
+docker_network:
+  - name: docker_network
+    state: present
+    driver: bridge
+
+vmagent:
+  name: vmagent
+  image: victoriametrics/vmagent:v1.89.1
+  port: 8429
+  networks:
+    - docker_network
+  jobs:
+    - node
+  extra_hosts:
+    - name: monitoring-server
+      ip: 127.0.0.1
+      port: 9100
+      job: node
+
+victoriametrics:
+  name: victoriametrics
+  image: victoriametrics/victoria-metrics:v1.89.1
+  ports:
+    graphiteListenAddr: 2003
+    opentsdbListenAddr: 4242
+    httpListenAddr: 8428
+    influxListenAddr: 8089
+  networks:
+    - docker_network
+
+grafana:
+  name: grafana
+  image: grafana/grafana:9.2.7
+  port: 3000
+  networks:
+    - docker_network
+
+vmalert:
+  name: vmalert
+  image: victoriametrics/vmalert:v1.89.1
+  port: 8880
+  networks:
+    - docker_network
+
+alertmanager:
+  name: alertmanager
+  image: prom/alertmanager:v0.25.0
+  port: 9093
+  routes:
+    - reseiver: sss
+      match:
+        job: job_name
+  receivers: 
+    - name: sss
+      token: token
+      chat_id: 234
+  default_receiver: sss
+  networks:
+    - docker_network

@@ -1,0 +1,43 @@
+[Unit]
+Description=Docker Service for {{ vmalert.name }}
+After=network.service docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop -t 60 {{ vmalert.name }}
+ExecStartPre=-/usr/bin/docker rm {{ vmalert.name }}
+ExecStart=/usr/bin/docker run \
+--rm \
+--name {{ vmalert.name }} \
+--publish {{ vmalert.port }}:8880 \
+-v /etc/victoriametrics/vmalert/alerts.yml:/etc/alerts/alerts.yml \
+{% if vmalert.networks is defined %}
+{% for network in vmalert.networks %}
+--network {{ network }} \
+{% endfor %}
+{% endif %}
+--log-driver 'syslog' \
+--log-opt 'tag={{ vmalert.name }}' \
+{{ vmalert.image }} \
+--datasource.url=http://victoriametrics:8428/ \
+--remoteRead.url=http://victoriametrics:8428/ \
+--remoteWrite.url=http://victoriametrics:8428/ \
+--notifier.url=http://alertmanager:9093/ \
+--rule=/etc/alerts/*.yml \
+--external.url=http://127.0.0.1:3000 \
+{% raw %}
+--external.alert.source=explore?orgId=1&left=["now-1h","now","VictoriaMetrics",{"expr":{{$$expr|jsonEscape|queryEscape}} },{"mode":"Metrics"},{"ui":[true,true,true,"none"]}]
+{% endraw %}
+ExecStop=-/usr/bin/docker stop -t 60 {{ vmalert.name }}
+
+ExecReload=/usr/bin/docker restart '{{ vmalert.name }}'
+
+Restart=always
+RestartSec=20s
+
+SuccessExitStatus=SIGKILL SIGTERM 143 137
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service
+

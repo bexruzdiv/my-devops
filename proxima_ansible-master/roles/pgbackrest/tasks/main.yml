@@ -1,0 +1,103 @@
+---
+- name: get myuser uid
+  getent:
+    database: passwd
+    split: ':'
+    key: 999
+  register: __pgbackrest_check_uid_999
+  ignore_errors: true
+
+- debug:
+    var: __pgbackrest_check_uid_999.failed
+
+- name: Set Found user name
+  when: not __pgbackrest_check_uid_999.failed
+  set_fact:
+    __pgbackrest_found_user: "{{ __pgbackrest_check_uid_999.ansible_facts.getent_passwd.keys() }}"
+
+- name: Change user UID
+  when: not __pgbackrest_check_uid_999.failed and not __pgbackrest_found_user[0] == "postgres"
+  user:
+    name: "{{ __pgbackrest_found_user[0] }}"
+    uid: 2000
+
+- name: Create group postgres
+  group:
+    name: postgres
+    state: present
+
+- name: Create Users Postgres
+  user:
+    name: postgres
+    group: postgres
+    system: true
+    state: present
+    create_home: false
+    uid: 999
+
+- name: Install dependencies Debian 
+  when: ansible_os_family == "Debian"
+  apt:
+    update_cache: true
+    pkg:
+      - postgresql-client 
+      - libxml2 
+      - libssh2-1
+
+- name: Install dependencies Redhat
+  when: ansible_os_family == "RedHat"
+  yum:
+    update_cache: true
+    name:
+      - postgresql-libs 
+      - libssh2
+
+- name: Copy pgbackrest binary file
+  ansible.builtin.copy:
+    src: pgbackrest
+    dest: /usr/bin
+    owner: postgres
+    group: postgres
+    mode: '0755'
+
+- name: Create directory and files
+  file:
+    path: "{{ item.path }}"
+    state: "{{ item.state }}"
+    mode: "{{ item.mode|default(omit) }}"
+    owner: "{{ item.owner|default(omit) }}"
+    group: "{{ item.group|default(omit) }}"
+  loop:
+    - { path: /var/log, state: directory}
+    - { path: /var/log/pgbackrest, state: directory, mode: "770", owner: postgres, group: postgres}
+    - { path: /etc/pgbackrest, state: directory, owner: postgres, group: postgres}
+    - { path: /etc/pgbackrest/conf.d, state: directory, owner: postgres, group: postgres}
+    - { path: "{{ pgbackrest_backup_dir }}", state: directory, mode: "750", owner: postgres, group: postgres}
+    - { path: /var/spool, state: directory}
+    - { path: /var/spool/pgbackrest, state: directory, owner: postgres, group: postgres}
+    - { path: "{{ pgbackrest_psql_data_dir }}/conf.d", state: directory, owner: postgres, group: postgres}
+  loop_control:
+    loop_var: item
+
+- name: Append line to postgresql configuration file
+  lineinfile:
+    path: "{{ pgbackrest_psql_data_dir }}/postgresql.conf"
+    line: include_dir 'conf.d' 
+
+- name: Create configuration file for pgbackrest
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: postgres
+    group: postgres
+    mode: "{{ item.mode|default(omit) }}"
+  loop:
+    - { src: pgbackrest.conf.j2, dest: /etc/pgbackrest/conf.d/pgbackrest.conf, mode: "640" }
+    - { src: psql.conf.j2, dest: "{{ pgbackrest_psql_data_dir }}/conf.d/psql.conf" }
+  loop_control:
+    loop_var: item
+  
+- name: Restart postgresql service | Unit name - {{ pgbackrest_psql_unit_name }}
+  systemd:
+    state: restarted
+    name: "{{ pgbackrest_psql_unit_name }}"

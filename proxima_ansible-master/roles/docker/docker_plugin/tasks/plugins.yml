@@ -1,0 +1,6 @@
+---
+- name: Install a plugin {{ item.name }}
+  community.docker.docker_plugin:
+    plugin_name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    alias: "{{ item.alias }}"

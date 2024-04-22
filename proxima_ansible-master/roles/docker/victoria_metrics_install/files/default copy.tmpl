@@ -1,0 +1,24 @@
+{{ define "telegram" }}
+{{ if gt (len .Alerts.Firing) 0 }}
+🔥🔥🔥 <b>Firing: </b> {{- len .Alerts.Firing }} alert(s) 🔥🔥🔥
+    {{- range .Alerts.Firing }} 
+************************************
+<u><b>{{ .Labels.alertname }}</b></u> 🔥
+<b>Labels:</b>
+{{ range $key, $value := .Labels }}{{ if ne $key "alertname" }}{{ $key }}: <code>{{ $value }}</code>{{ "\n" }}{{ end }}{{ end }}
+<b>Annotations:</b>
+{{ range $key, $value := .Annotations }}{{ if ne $key "resolv" }}{{ if eq $key "summary" }}<i>{{ $key }}: <code>{{ $value }}</code></i>{{ "\n" }}{{ else }}{{ $key }}: <code>{{ $value }}</code>{{ "\n" }}{{ end }}{{ end }}{{ end }}
+    {{ end }}
+{{ end }}
+{{ if gt (len .Alerts.Resolved) 0 }}
+✅✅✅ <b>Resolved: </b> {{- len .Alerts.Resolved }} alert(s) ✅✅✅
+    {{- range .Alerts.Resolved }} 
+************************************
+<u><b>{{ .Labels.alertname }}</b></u> ✅
+{{ .Annotations.resolv }}
+<b>Starts at: </b> {{ .StartsAt }}
+<b>Ends at: </b> {{ .EndsAt }}
+<b>Duration: </b> {{(.EndsAt.Sub .StartsAt).Truncate 1000000000}}
+    {{ end }}
+{{ end }}
+{{ end }}

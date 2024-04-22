@@ -1,0 +1,6 @@
+- name: Deploy MinIO server
+  hosts: "{{ hostname }}" 
+  become: yes
+
+  roles:
+    - role: minio

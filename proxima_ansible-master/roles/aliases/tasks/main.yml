@@ -1,0 +1,18 @@
+---
+- name: Add aliases to /home/{{ username }}/.zshrc
+  blockinfile:
+    path: /home/{{ username }}/.zshrc
+    block: |
+      alias {{ item.key }}='{{ item.value }}'
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.key }}"
+  when: is_used_zsh
+  loop: "{{ aliases }}"
+
+- name: Add aliases to /home/{{ username }}/.bashrc
+  blockinfile:
+    path: /home/{{ username }}/.bashrc
+    block: |
+      alias {{ item.key }}='{{ item.value }}'
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.key }}"
+  when: not is_used_zsh
+  loop: "{{ aliases }}"

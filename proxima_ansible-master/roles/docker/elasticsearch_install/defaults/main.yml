@@ -1,0 +1,11 @@
+---
+docker_network:
+  - name: docker_network
+    state: present
+    driver: bridge
+
+elasticsearch:
+  image: elasticsearch:6.5.4
+  networks:
+    - docker_network
+  external_port: 9200

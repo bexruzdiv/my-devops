@@ -1,0 +1,43 @@
+## -- Create default rules for monitoring the cluster
+defaultRules:
+  create: {{ kubernetes_monitoring_victoria_default_rules_create }}
+  rules:
+    etcd: {{ kubernetes_monitoring_victoria_default_rules_etcd }}
+    general: {{ kubernetes_monitoring_victoria_default_rules_general }}
+    k8s: {{ kubernetes_monitoring_victoria_default_rules_k8s }}
+    kubeApiserver: {{ kubernetes_monitoring_victoria_default_rules_kubeapiserver }}
+    kubeApiserverAvailability: {{ kubernetes_monitoring_victoria_default_rules_kubeapiserveravailability }}
+    kubeApiserverBurnrate: {{ kubernetes_monitoring_victoria_default_rules_kubeapiserverburnrate }}
+    kubeApiserverHistogram: {{ kubernetes_monitoring_victoria_default_rules_kubeapiserverhistogram }}
+    kubeApiserverSlos: {{ kubernetes_monitoring_victoria_default_rules_kubeapiserverslos }}
+    kubelet: {{ kubernetes_monitoring_victoria_default_rules_kubelet }}
+    kubePrometheusGeneral: {{ kubernetes_monitoring_victoria_default_rules_kubeprometheusgeneral }}
+    kubePrometheusNodeRecording: {{ kubernetes_monitoring_victoria_default_rules_kubeprometheusnoderecording }}
+    kubernetesApps: {{ kubernetes_monitoring_victoria_default_rules_kubernetesapps }}
+    kubernetesResources: {{ kubernetes_monitoring_victoria_default_rules_kubernetesresources }}
+    kubernetesStorage: {{ kubernetes_monitoring_victoria_default_rules_kubernetesstorage }}
+    kubernetesSystem: {{ kubernetes_monitoring_victoria_default_rules_kubernetessystem }}
+    kubeScheduler: {{ kubernetes_monitoring_victoria_default_rules_kubescheduler }}
+    kubeStateMetrics: {{ kubernetes_monitoring_victoria_default_rules_kubestatemetrics }}
+    network: {{ kubernetes_monitoring_victoria_default_rules_network }}
+    node: {{ kubernetes_monitoring_victoria_default_rules_node }}
+    vmagent: {{ kubernetes_monitoring_victoria_default_rules_vmagent }}
+    vmsingle: {{ kubernetes_monitoring_victoria_default_rules_vmsingle }}
+    vmhealth: {{ kubernetes_monitoring_victoria_default_rules_vmhealth }}
+    alertmanager: {{ kubernetes_monitoring_victoria_default_rules_alertmanager }}
+
+  # -- Runbook url prefix for default rules
+  runbookUrl: {{ kubernetes_monitoring_victoria_default_rules_runbook_url }}
+  ## Reduce app namespace alert scope
+  appNamespacesTarget: ".*"
+
+  # -- Labels for default rules
+  labels: {}
+  # -- Annotations for default rules
+  annotations: {}
+
+  # -- Additional labels for PrometheusRule alerts
+  additionalRuleLabels: {}
+
+## -- Create default dashboards
+defaultDashboardsEnabled: {{ kubernetes_monitoring_victoria_default_dashboards_enabled }}

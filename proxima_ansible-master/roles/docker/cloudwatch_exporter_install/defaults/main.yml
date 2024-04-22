@@ -1,0 +1,15 @@
+---
+docker_network:
+  - name: docker_network
+    state: present
+    driver: bridge
+
+cloudwatch_exporter:
+  image: prom/cloudwatch-exporter:latest
+  networks:
+    - docker_network
+  external_port: 9106
+  access_key: ddd
+  secret_key: ddd
+  region: ap-south-1
+  metrics: []

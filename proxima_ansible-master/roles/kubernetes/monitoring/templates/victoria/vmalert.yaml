@@ -1,0 +1,32 @@
+vmalert:
+  annotations: {}
+  enabled: {{ kubernetes_monitoring_victoria_vmalert_enabled }}
+
+  # Controls whether VMAlert should use VMAgent or VMInsert as a target for remotewrite
+  remoteWriteVMAgent: false
+  # spec for VMAlert crd
+  # https://docs.victoriametrics.com/operator/api.html#vmalertspec
+  spec:
+    nodeSelector:
+      {{ kubernetes_monitoring_node_label }}: "true"
+    selectAllByDefault: true
+    evaluationInterval: 15s
+
+    # External labels to add to all generated recording rules and alerts
+    externalLabels:
+      cluster: {{ kubernetes_bootstrap_project_name }}
+
+      # TO-DO: think about environment label
+
+    notifier:
+      url: {{ kubernetes_monitoring_victoria_vmalert_notifier_url }}   # "http://alertmanager.monitoring.svc.cluster.local:9093"
+    datasource:
+      url:  {{ kubernetes_monitoring_victoria_vmalert_datasource_url }} # "http:///vmsingle:8429"
+  # extra vmalert annotation templates
+  templateFiles:
+    {}
+    # template_1.tmpl: |-
+    #   {{ define "hello" -}}
+    #   hello, Victoria!
+    #   {{- end }}
+    # template_2.tmpl: ""

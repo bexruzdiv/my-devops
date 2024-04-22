@@ -1,0 +1,13 @@
+docker_mongodb_port: 30017
+docker_mongodb_root_password: Uosaivara5Iexai2meeMuPh6thee5bae
+docker_mongodb_container_name: mongodatabase
+docker_mongodb_data_volume: /var/data/mongodatabase
+docker_mongodb_data_volume_in_docker: /data/db
+docker_mongodb_systemd_service_template: mongodb.service.j2
+docker_mongodb_systemd_service_path: /etc/systemd/system
+docker_mongodb_image_name: mongo
+docker_mongodb_image_version: 6.0.5
+docker_mongodb_docker_image: "{{ docker_mongodb_image_name }}:{{ docker_mongodb_image_version }}"
+docker_mongodb_systemd_config_template: file/mongod.conf
+docker_mongodb_systemd_config_in_docker: /etc/mongod.conf
+docker_mongodb_systemd_service_name: mongodatabase.service

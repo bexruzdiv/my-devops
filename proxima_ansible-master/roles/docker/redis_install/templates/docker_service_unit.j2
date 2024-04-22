@@ -1,0 +1,35 @@
+[Unit]
+Description=Docker Service for redis
+After=network.service docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop -t 60 redis
+ExecStartPre=-/usr/bin/docker rm redis
+ExecStart=/usr/bin/docker run \
+--rm \
+--name redis \
+--publish {{ redis.external_port }}:6379 \
+-v redis-data:/redis \
+{% if redis.networks is defined %}
+{% for network in redis.networks %}
+--network {{ network }} \
+{% endfor %}
+{% endif %}
+--log-driver 'syslog' \
+--log-opt 'tag=redis' \
+{{ redis.image }} \
+redis-server --save 20 1 --loglevel warning
+ExecStop=-/usr/bin/docker stop -t 60 redis
+
+ExecReload=/usr/bin/docker restart 'redis'
+
+Restart=always
+RestartSec=20s
+
+SuccessExitStatus=SIGKILL SIGTERM 143 137
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service
+

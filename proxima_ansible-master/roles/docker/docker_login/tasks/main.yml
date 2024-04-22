@@ -1,0 +1,7 @@
+---
+# tasks file for docker_login
+- name: Log into private registry
+  docker_login:
+    registry: "{{ docker_login.registry }}"
+    username: "{{ docker_login.username }}"
+    password: "{{ docker_login.password }}"

@@ -1,0 +1,38 @@
+[Unit]
+Description=Docker Service for {{ grafana.name }}
+After=network.service docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop -t 60 {{ grafana.name }}
+ExecStartPre=-/usr/bin/docker rm {{ grafana.name }}
+ExecStart=/usr/bin/docker run \
+--rm \
+--name {{ grafana.name }} \
+--publish {{ grafana.port }}:3000 \
+-v grafanadata:/var/lib/grafana \
+-v /etc/victoriametrics/provisioning/:/etc/grafana/provisioning/ \
+-v /etc/victoriametrics/dashboards/victoriametrics.json:/var/lib/grafana/dashboards/vm.json \
+-v /etc/victoriametrics/dashboards/vmagent.json:/var/lib/grafana/dashboards/vmagent.json \
+-v /etc/victoriametrics/dashboards/vmalert.json:/var/lib/grafana/dashboards/vmalert.json \
+{% if grafana.networks is defined %}
+{% for network in grafana.networks %}
+--network {{ network }} \
+{% endfor %}
+{% endif %}
+--log-driver 'syslog' \
+--log-opt 'tag={{ grafana.name }}' \
+{{ grafana.image }} 
+ExecStop=-/usr/bin/docker stop -t 60 {{ grafana.name }}
+
+ExecReload=/usr/bin/docker restart '{{ grafana.name }}'
+
+Restart=always
+RestartSec=20s
+
+SuccessExitStatus=SIGKILL SIGTERM 143 137
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service
+

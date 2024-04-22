@@ -1,0 +1,35 @@
+route:
+  group_wait: 5s
+  group_interval: 5m
+  repeat_interval: 5h
+  group_by: []
+  receiver: "alertmanager-bot"
+  routes:
+{% if vmagent.extra_hosts is defined %}
+{% for host in vmagent.extra_hosts %}
+    - match:
+        instance: "{{ host.name }}:{{ host.port }}"
+      receiver: "alertmanager-bot"
+{% endfor %}
+{% endif %}
+      # continue: true
+      # active_time_intervals:
+      #   - tashkent
+receivers:
+  - name: "alertmanager-bot"
+    telegram_configs:
+      - bot_token: {{ alertmanager.bot_token }}
+        # send_resolved: true
+        chat_id: {{ alertmanager.chat_id }}
+        api_url: https://api.telegram.org
+        parse_mode: "HTML"
+        {% raw -%}
+        message: '{{ template "telegram" .}}'
+        {%- endraw %}
+
+templates:
+  - "/config/default.tmpl"
+# time_intervals:
+#   - name: tashkent
+#     time_intervals:
+#       - location: Asia/Tashkent

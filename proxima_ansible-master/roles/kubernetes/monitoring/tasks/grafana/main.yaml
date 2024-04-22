@@ -1,0 +1,28 @@
+# Copyright 2023 PROXIMAOPS LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Setup grafana with helm
+  environment:
+    K8S_AUTH_KUBECONFIG: "{{ kubernetes_bootstrap_kubeconfig_path }}"
+  kubernetes.core.helm:
+    name: "{{ kubernetes_monitoring_grafana_release_name }}"
+    chart_ref: "{{ kubernetes_monitoring_grafana_chart_name }}"
+    chart_version: "{{ kubernetes_monitoring_grafana_chart_version }}"
+    release_namespace: "{{ kubernetes_monitoring_namespace }}"
+    atomic: true
+    wait: true
+    update_repo_cache: true
+    values:  "{{ kubernetes_monitoring_grafana_setup_values_file }}"
+  tags: setup_grafana
+  when: kubernetes_monitoring_setup_grafana | default(true)

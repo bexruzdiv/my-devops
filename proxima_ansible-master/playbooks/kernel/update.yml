@@ -1,0 +1,7 @@
+- name: Update kernel settings
+  hosts: delever-k8s
+  become: yes
+
+  roles:
+    - role: kernel
+

@@ -1,0 +1,58 @@
+---
+- name: "Pull alertmanager image"
+  docker_image:
+    name: "{{ alertmanager.image }}"
+    source: pull
+  tags:
+    - install
+
+- name: Prepare folders
+  file: path="{{ item.path }}" state=directory mode="{{ item.mode }}" owner="{{ item.owner }}"
+  with_items:
+    - { "path": "/var/log/docker", "owner": "root", "mode": "0755" }
+    - {
+        "path": "/var/log/docker/alertmanager",
+        "owner": "root",
+        "mode": "0777",
+      }
+
+- name: alertmanager | Send config files
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+    owner: root
+    group: root
+  with_items:
+    - src: files/default.tmpl
+      dest: /etc/victoriametrics/default.tmpl
+
+- name: "Install Systemd service for alertmanager"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - install
+  with_items:
+    - src: alertmanager.j2
+      dest: /etc/systemd/system/alertmanager.service
+    - src: alertmanager.yml.j2
+      dest: /etc/victoriametrics/alertmanager.yml
+
+- name: Reread systemd configs
+  systemd:
+    daemon_reload: yes
+  tags:
+    - install
+
+- name: "Enable and start alertmanager service"
+  systemd:
+    name: "alertmanager"
+    enabled: yes
+    state: restarted
+  tags:
+    - enable
+    - install

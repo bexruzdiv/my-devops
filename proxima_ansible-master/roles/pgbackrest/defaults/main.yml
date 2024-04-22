@@ -1,0 +1,8 @@
+pgbackrest_psql_data_dir: /var/lib/postgresql/data
+pgbackrest_psql_port: 5432
+pgbackrest_psql_unit_name: postgresdatabase
+pgbackrest_stanza_name: testdb
+pgbackrest_backup_dir: /var/lib/pgbackrest
+pgbackrest_full_backup_retention: 2
+pgbackrest_diff_backup_retention: 3
+pgbackrest_compress_level: 3

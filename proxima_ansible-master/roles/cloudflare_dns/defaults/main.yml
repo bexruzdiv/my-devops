@@ -1,0 +1,11 @@
+---
+# defaults file for cloudflare_dns
+subdomains: 
+  - subdomain: "test1"
+    ip_address: 95.217.169.218
+    zone: proximaops.io
+    email: cloudflare@proximaops.io
+    token: ""
+
+
+subdomain_state: present

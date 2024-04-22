@@ -1,0 +1,5 @@
+---
+docker_plugins:
+  - name: grafana/loki-docker-driver:latest
+    state: enable
+    alias: loki

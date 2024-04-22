@@ -1,0 +1,23 @@
+---
+
+- name: install docker extension
+  copy:
+    src: "{{ ufw_docker_local_path }}"
+    dest: "{{ ufw_docker_path }}"
+    mode: 0755
+    owner: root
+    group: root
+  tags:
+    - ufw-install-dependencies
+
+- name: configure | ufw-docker
+  command: "{{ ufw_docker_install_cmd }}"
+  tags:
+    - ufw-docker-install
+
+- name: configure | add docker rules
+  command:  "{{ item.rule }}"
+  with_items: "{{ ufw_docker_rules }}"
+  notify: reload ufw
+  tags:
+    - ufw-configure-rules

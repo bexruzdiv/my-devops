@@ -1,0 +1,66 @@
+---
+- name: "Pull vmalert image"
+  docker_image:
+    name: "{{ vmalert.image }}"
+    source: pull
+  tags:
+    - install
+
+- name: Prepare folders
+  file: path="{{ item.path }}" state=directory mode="{{ item.mode }}" owner="{{ item.owner }}"
+  with_items:
+    - { "path": "/var/log/docker", "owner": "root", "mode": "0755" }
+    - { "path": "/var/log/docker/vmalert", "owner": "root", "mode": "0777" }
+
+- name: Make directories for vmalert
+  file:
+    path: "{{ item.dest }}"
+    state: "{{ item.state }}"
+    mode: "0755"
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"
+  with_items:
+    - state: directory
+      dest: /etc/victoriametrics/vmalert
+
+- name: VMalert | Send config files
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"
+  with_items:
+    - src: files/vmalert/alerts.yml
+      dest: /etc/victoriametrics/vmalert/alerts.yml
+    - src: files/vmalert/alerts-health.yml
+      dest: /etc/victoriametrics/vmalert/alerts-health.yml
+    - src: files/vmalert/alerts-vmagent.yml
+      dest: /etc/victoriametrics/vmalert/alerts-vmagent.yml
+    - src: files/vmalert/alerts-vmalert.yml
+      dest: /etc/victoriametrics/vmalert/alerts-vmalert.yml
+
+- name: "Install Systemd service for vmalert"
+  template:
+    src: vmalert.j2
+    dest: "/etc/systemd/system/vmalert.service"
+    owner: root
+    group: root
+    mode: "0644"
+  tags:
+    - install
+
+- name: Reread systemd configs
+  systemd:
+    daemon_reload: yes
+  tags:
+    - install
+
+- name: "Enable and start vmalert service"
+  systemd:
+    name: "vmalert"
+    enabled: yes
+    state: restarted
+  tags:
+    - enable
+    - install

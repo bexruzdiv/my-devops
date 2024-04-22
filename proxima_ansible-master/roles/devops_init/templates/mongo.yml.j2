@@ -1,0 +1,16 @@
+version: "{{ docker_compose_version }}"
+
+services:
+  mongo:
+    image: mongo:"{{ mongo_docker.version }}"
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: {{ "${" }}MONGO_INITDB_ROOT_USERNAME{{ "}" }}
+      MONGO_INITDB_ROOT_PASSWORD: {{ "${" }}MONGO_INITDB_ROOT_PASSWORD{{ "}" }}
+    ports:
+      - {{ mongo_docker.external_port }}:27017
+    volumes:
+      - {{ mongo_docker.volume }}:/data/db
+
+volumes:
+  {{ mongo_docker.volume }}:

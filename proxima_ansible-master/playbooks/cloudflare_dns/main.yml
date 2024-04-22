@@ -1,0 +1,8 @@
+---
+- name: "Add subdomains"
+  hosts: localhost
+  gather_facts: no
+  become: no 
+
+  roles:
+    - role: cloudflare_dns

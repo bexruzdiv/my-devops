@@ -1,0 +1,28 @@
+---
+# tasks file for docker_run
+- name: Create docker network
+  include_tasks: create_network.yml
+  with_items: "{{ docker_network }}"
+
+- name: Make dir for config files
+  file:
+    path: /etc/victoriametrics
+    state: directory
+    mode: "0755"
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"
+
+- name: Create container VictoriaMetrics
+  include_tasks: victoriametrics.yml
+
+- name: Create container VMagent
+  include_tasks: vmagent.yml
+
+- name: Create container VMagent
+  include_tasks: grafana.yml
+
+- name: Create container VMagent
+  include_tasks: alertmanager.yml
+
+- name: Create container VMagent
+  include_tasks: vmalert.yml

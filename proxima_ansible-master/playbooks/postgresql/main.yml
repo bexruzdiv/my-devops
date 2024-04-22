@@ -1,0 +1,7 @@
+---
+- name: "Install postgres"
+  hosts: "{{ hostname }}"
+  gather_facts: no
+  become: yes
+  roles:
+    - role: postgresql

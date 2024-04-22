@@ -1,0 +1,30 @@
+---
+- name: Get Node Names
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Get Node Names
+      command: kubectl get nodes -o custom-columns=NAME:.metadata.name --no-headers
+      register: node_names_output
+    - name: Separate node
+      set_fact:
+        separated_nodes: "{{ node_names_output.stdout_lines | join(' ') }}"
+
+    - name: Get IP addresses of cluster nodes
+      shell: "kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type==\"InternalIP\")].address}'"
+      register: cluster_ips
+
+    - name: Separate IP addresses
+      set_fact:
+        separated_ips: "{{ cluster_ips.stdout_lines | join(' ') }}"
+    - name: Generate Ansible node name
+      template:
+        src: inventory_template.ini.j2
+        dest: "inventory.ini"
+
+
+[servers]
+{% for item in separated_ips.split(' ') | zip(separated_nodes.split(' ')) | list %}
+{{ item.1 }} ansible_ssh_host={{ item.0 }} ansible_ssh_private_key_file=/home/bexruz/kubespray  ansible_user=root ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+{% endfor %}
+

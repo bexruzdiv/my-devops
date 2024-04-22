@@ -1,0 +1,41 @@
+---
+- name: Alertmanager | Send config files
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"
+  with_items:
+    - src: files/default.tmpl
+      dest: /home/{{ user_name }}/tmp/default.tmpl
+
+- name: Alertmanager | Send template files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"
+  with_items:
+    - src: templates/alertmanager.yml.j2
+      dest: /home/{{ user_name }}/tmp/alertmanager.yml
+
+- name: Alertmanager | Docker compose up
+  docker_stack:
+    state: present
+    name: "{{ monitoring_stack_name }}"
+    compose:
+      # - /opt/docker-compose.yml
+      - version: "3.7"
+        services:
+          alertmanager:
+            restart: on-failure
+            image: "prom/alertmanager:{{ alertmanager.version }}"
+            ports:
+              - "{{ alertmanager.external_port }}:9093"
+            volumes:
+              - /home/{{ user_name }}/tmp/alertmanager.yml:/etc/alertmanager/config.yml
+            command:
+              - --config.file=/etc/alertmanager/config.yml
+              - --storage.path=/alertmanager

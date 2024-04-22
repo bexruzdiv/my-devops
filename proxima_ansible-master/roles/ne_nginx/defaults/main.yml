@@ -1,0 +1,5 @@
+---
+# Parameters used when creating new Certbot certs.
+nginx_admin_email: zsaidov1988@gmail.com
+nginx_certbot_certificate_presence: yes
+nginx_domains: {}

@@ -1,0 +1,22 @@
+postgres_admin_password: diuKoz0die2aik9zohth8iTa2rui1bei
+postgres_admin_user: postgres
+postgres_ext_port: 30034
+databases:
+  - name: user_service
+    user: user_service
+    pass: aighekoo6roiF3ie
+  - name: integration_service
+    user: integration_service
+    pass: oodethies2Mee1ae
+  - name: subscription_service
+    user: subscription_service
+    pass: YTY5YmE3MzQ0M2NlNzI0OWU4MmI4ZDZi
+  - name: notification_service
+    user: notification_service
+    pass: OTdhY2ExZGM1NjkwMjU4MDQ5M2M2ZmRh
+  - name: sms_service
+    user: sms_service
+    pass: NWEzNThiMjIzNjg4OTI5MjBiYTEzNDc0
+  - name: publisher_service
+    user: publisher_service
+    pass: MzM0N2UwMTZiOTRiYmQyY2Y2OWY1NWNm

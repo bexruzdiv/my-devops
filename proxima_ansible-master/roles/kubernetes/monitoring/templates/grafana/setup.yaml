@@ -1,0 +1,133 @@
+# Copyright 2023 PROXIMAOPS LLC
+#
+# Licensed under the Apache License, Version 2.0 (the License);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an AS IS BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+ingress:
+  enabled: {{ kubernetes_monitoring_grafana_ingress_enabled }}
+  # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+  # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+  # ingressClassName: nginx
+  # Values can be templated
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  labels: {}
+  path: /
+
+  # pathType is only for k8s >= 1.1=
+  pathType: Prefix
+
+  hosts:
+    - {{ kubernetes_monitoring_grafana_ingress_host }}
+  ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+  extraPaths: []
+  tls:
+    - secretName: {{ kubernetes_monitoring_grafana_ingress_secret_name }}
+      hosts:
+        - {{ kubernetes_monitoring_grafana_ingress_host }}
+
+
+resources: {}
+
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+#
+nodeSelector:
+  {{ kubernetes_monitoring_node_label }}: "true"
+
+## Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: []
+
+## Affinity for pod assignment (evaluated as template)
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+affinity: {}
+
+persistence:
+  type: "pvc"
+  enabled: {{ kubernetes_monitoring_grafana_persistence_enabled }}
+  # storageClassName: default
+  accessModes:
+    - ReadWriteOnce
+  size: {{ kubernetes_monitoring_grafana_persistence_size }}
+  # annotations: {}
+  finalizers:
+    - kubernetes.io/pvc-protection
+  # selectorLabels: {}
+  ## Sub-directory of the PV to mount. Can be templated.
+  # subPath: 
+  ## Name of an existing PVC. Can be templated.
+  # existingClaim:
+  ## Extra labels to apply to a PVC.
+  extraPvcLabels: {}
+
+  ## If persistence is not enabled, this allows to mount the
+  ## local storage in-memory to improve performance
+  ##
+  inMemory:
+    enabled: false
+    ## The maximum usage on memory medium EmptyDir would be
+    ## the minimum value between the SizeLimit specified
+    ## here and the sum of memory limits of all containers in a pod
+    ##
+    # sizeLimit: 300Mi
+
+# Administrator credentials when not using an existing secret (see below)
+adminUser: {{ kubernetes_monitoring_grafana_admin_user }}
+adminPassword: {{ kubernetes_monitoring_grafana_admin_password }}
+
+## Pass the plugins you want installed as a list.
+##
+plugins: {{ kubernetes_monitoring_grafana_plugins }}
+
+## Grafana's primary configuration
+## NOTE: values in map will be converted to ini format
+## ref: http://docs.grafana.org/installation/configuration/
+##
+grafana.ini:
+  paths:
+    data: {{ kubernetes_monitoring_grafana_data_path }}
+    logs: {{ kubernetes_monitoring_grafana_logs_path }}
+    plugins: {{ kubernetes_monitoring_grafana_plugins_path }}
+    provisioning: {{ kubernetes_monitoring_grafana_provisioning_path }}
+  analytics:
+    check_for_updates: {{ kubernetes_monitoring_grafana_analytics_check_for_updates }}
+  log:
+    mode: {{ kubernetes_monitoring_grafana_log_mode }}
+    console:
+      level: {{ kubernetes_monitoring_grafana_log_console_level }}
+      format: {{ kubernetes_monitoring_grafana_log_console_format }}
+  server:
+    domain: {{ kubernetes_monitoring_grafana_domain }}
+  dashboards:
+    default_home_dashboard_path: {{ kubernetes_monitoring_grafana_default_home_dashboard_path }}
+  users:
+    default_theme: {{ kubernetes_monitoring_grafana_default_theme }}
+  emails:
+    welcome_email_on_sign_up: {{ kubernetes_monitoring_grafana_welcome_email_on_sign_up }}
+  smtp:
+    enabled: {{ kubernetes_monitoring_grafana_smtp_enabled }}
+    host: {{ kubernetes_monitoring_grafana_smtp_host }}
+    user: {{ kubernetes_monitoring_grafana_smtp_user }}
+    password: {{ kubernetes_monitoring_grafana_smtp_password }}
+    skip_verify: {{ kubernetes_monitoring_grafana_smtp_skip_verify }} 
+    from_address: {{ kubernetes_monitoring_grafana_smtp_from_address }}
+    from_name: {{ kubernetes_monitoring_grafana_smtp_from_name }}
+  date_formats:
+    default_timezone: {{ kubernetes_monitoring_grafana_default_timezone }}
+  database:
+    type: {{ kubernetes_monitoring_grafana_database_type }}
+    url: {{ kubernetes_monitoring_grafana_database_url }}
+    ssl_mode: {{ kubernetes_monitoring_grafana_database_ssl_mode }}

@@ -1,0 +1,6 @@
+minio_access_key: kk 
+minio_secret_key: kk 
+minio_volume_path: /mnt/minio_data
+minio_image_version: RELEASE.2022-01-22T23-29-10Z
+minio_ui_port: 9001
+minio_api_port: 9002

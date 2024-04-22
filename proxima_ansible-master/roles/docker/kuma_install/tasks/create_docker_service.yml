@@ -1,0 +1,64 @@
+---
+- name: "Pull kuma image"
+  docker_image:
+    name: "{{ kuma.image }}"
+    source: pull
+  tags:
+    - install
+
+- name: Prepare folders
+  file: path="{{ item.path }}" state=directory mode="{{ item.mode }}" owner="{{ item.owner }}"
+  with_items:
+    - { "path": "/var/log/docker", "owner": "root", "mode": "0755" }
+    - {
+        "path": "/var/log/docker/kuma",
+        "owner": "root",
+        "mode": "0777",
+      }
+
+# - name: Make directories for kuma
+#   file:
+#     path: "{{ item.dest }}"
+#     state: "{{ item.state }}"
+#     mode: "0755"
+#     owner: "{{ user_name }}"
+#     group: "{{ user_primary_group }}"
+#   with_items:
+#     - state: directory
+#       dest: /etc/victoriametrics
+
+# - name: kuma | Send config files
+#   copy:
+#     src: "{{ item.src }}"
+#     dest: "{{ item.dest }}"
+#     mode: 0644
+#     owner: "{{ user_name }}"
+#     group: "{{ user_primary_group }}"
+#   with_items:
+#     - src: files/local-config.yml
+#       dest: /etc/victoriametrics/local-config.yml
+
+- name: "Install Systemd service for kuma"
+  template:
+    src: docker_service_unit.j2
+    dest: "/etc/systemd/system/kuma.service"
+    owner: root
+    group: root
+    mode: "0644"
+  tags:
+    - install
+
+- name: Reread systemd configs
+  systemd:
+    daemon_reload: yes
+  tags:
+    - install
+
+- name: "Enable and start kuma service"
+  systemd:
+    name: "kuma"
+    enabled: yes
+    state: restarted
+  tags:
+    - enable
+    - install

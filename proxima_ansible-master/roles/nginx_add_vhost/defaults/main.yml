@@ -1,0 +1,14 @@
+---
+# Parameters used when creating new Certbot certs.
+nginx_admin_email: bexruzffakk02@gmail.com
+nginx_certbot_certificate_presence: yes
+nginx_domains:
+  
+  - domain: vault124.bexruzdev.uz
+    port: 8200
+    upstream: vault124.bexruzdev.uz
+    client_max_body_size: 100M
+    host: 65.108.53.194
+    host2: 65.108.53.195
+    host3: 65.108.53.196
+    renew: true

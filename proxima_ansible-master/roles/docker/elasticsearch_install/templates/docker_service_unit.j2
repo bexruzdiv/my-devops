@@ -1,0 +1,34 @@
+[Unit]
+Description=Docker Service for elasticsearch
+After=network.service docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop -t 60 elasticsearch
+ExecStartPre=-/usr/bin/docker rm elasticsearch
+ExecStart=/usr/bin/docker run \
+--rm \
+--name elasticsearch \
+--publish {{ elasticsearch.external_port }}:9200 \
+-v elasticsearch-data:/usr/share/elasticsearch/data \
+-e "discovery.type=single-node" \
+-e "xpack.security.enabled=false" \
+{% if elasticsearch.networks is defined %}
+{% for network in elasticsearch.networks %}
+--network {{ network }} \
+{% endfor %}
+{% endif %}
+--log-driver 'syslog' \
+--log-opt 'tag=elasticsearch' \
+{{ elasticsearch.image }}
+
+ExecReload=/usr/bin/docker restart 'elasticsearch'
+
+Restart=always
+RestartSec=20s
+
+SuccessExitStatus=SIGKILL SIGTERM 143 137
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service

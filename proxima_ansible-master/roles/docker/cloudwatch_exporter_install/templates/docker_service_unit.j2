@@ -1,0 +1,36 @@
+[Unit]
+Description=Docker Service for cloudwatch-exporter
+After=network.service docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop -t 60 cloudwatch-exporter
+ExecStartPre=-/usr/bin/docker rm cloudwatch-exporter
+ExecStart=/usr/bin/docker run \
+--rm \
+--name cloudwatch-exporter \
+--publish {{ cloudwatch_exporter.external_port }}:9106 \
+-v /etc/victoriametrics/cw_config.yml:/config/config.yml \
+{% if cloudwatch_exporter.networks is defined %}
+{% for network in cloudwatch_exporter.networks %}
+--network {{ network }} \
+{% endfor %}
+{% endif %}
+-e AWS_ACCESS_KEY_ID={{ cloudwatch_exporter.access_key }} \
+-e AWS_SECRET_ACCESS_KEY={{ cloudwatch_exporter.secret_key }} \
+--log-driver 'syslog' \
+--log-opt 'tag=cloudwatch-exporter' \
+{{ cloudwatch_exporter.image }}
+ExecStop=-/usr/bin/docker stop -t 60 cloudwatch-exporter
+
+ExecReload=/usr/bin/docker restart 'cloudwatch-exporter'
+
+Restart=always
+RestartSec=20s
+
+SuccessExitStatus=SIGKILL SIGTERM 143 137
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service
+

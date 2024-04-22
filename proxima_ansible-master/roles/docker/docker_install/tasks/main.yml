@@ -1,0 +1,8 @@
+---
+- name: Ubuntu | Docker install
+  include_tasks: ubuntu.yml
+  when: ansible_facts['pkg_mgr'] == "apt"
+
+- name: CentOS | Docker install
+  include_tasks: centos.yml
+  when: ansible_facts['pkg_mgr'] == "yum"

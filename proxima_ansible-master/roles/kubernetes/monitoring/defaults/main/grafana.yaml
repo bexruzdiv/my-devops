@@ -1,0 +1,110 @@
+### Grafana global settings
+kubernetes_monitoring_grafana_release_name: grafana
+kubernetes_monitoring_grafana_chart_name: grafana/grafana
+kubernetes_monitoring_grafana_setup_values_file: "{{ lookup('template', 'grafana/main.yaml') | from_yaml }}"
+kubernetes_monitoring_grafana_chart_version: 6.58.5
+
+# Grafana setup settings ( https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana )
+kubernetes_monitoring_grafana_ingress_enabled: true
+kubernetes_monitoring_grafana_ingress_host: "{{ kubernetes_monitoring_grafana_domain }}"
+kubernetes_monitoring_grafana_ingress_secret_name: grafana-ingress-tls
+kubernetes_monitoring_grafana_persistence_enabled: false
+kubernetes_monitoring_grafana_persistence_size: 5Gi
+kubernetes_monitoring_grafana_admin_user: admin
+kubernetes_monitoring_grafana_admin_password: oopezohsheghohVahteeleesei5Raith0Kei8oYuoqu8ohdienga7coo9Rie9cho
+kubernetes_monitoring_grafana_plugins:
+  - digrich-bubblechart-panel
+  - grafana-clock-panel
+  - grafana-oncall-app
+  - marcusolsson-gantt-panel
+
+kubernetes_monitoring_grafana_default_theme: system # dark, light, system
+kubernetes_monitoring_grafana_default_timezone: Asia/Tashkent # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+kubernetes_monitoring_grafana_analytics_check_for_updates: true
+
+kubernetes_monitoring_grafana_log_mode: console # console, file, syslog
+kubernetes_monitoring_grafana_log_console_format: json # text, console and json
+kubernetes_monitoring_grafana_log_console_level: info # debug, info, warn, error, critical
+
+kubernetes_monitoring_grafana_smtp_enabled: true
+kubernetes_monitoring_grafana_welcome_email_on_sign_up: true
+kubernetes_monitoring_grafana_smtp_host: smtp.mail.ru:465
+kubernetes_monitoring_grafana_smtp_port: 465
+kubernetes_monitoring_grafana_smtp_user: grafana@proximaops.io
+kubernetes_monitoring_grafana_smtp_password: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/grafana:app-pass') }}"
+kubernetes_monitoring_grafana_smtp_skip_verify: true
+kubernetes_monitoring_grafana_smtp_tls: false
+kubernetes_monitoring_grafana_smtp_from_address: grafana@proximaops.io
+kubernetes_monitoring_grafana_smtp_from_name: Proxima Monitoring System
+
+kubernetes_monitoring_grafana_data_path: /var/lib/grafana/
+kubernetes_monitoring_grafana_logs_path: /var/log/grafana
+kubernetes_monitoring_grafana_plugins_path: /var/lib/grafana/plugins
+kubernetes_monitoring_grafana_provisioning_path: /etc/grafana/provisioning
+kubernetes_monitoring_grafana_default_home_dashboard_path: dashboards/grafana-dashboards-kubernetes/k8s-views-global
+
+kubernetes_monitoring_grafana_database_type: postgres # mysql, postgres
+kubernetes_monitoring_grafana_database_url:  "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/grafana:postgres-url') }}"  # mysql://user:secret@host:port/database
+kubernetes_monitoring_grafana_database_ssl_mode: disable # For Postgres, use either disable, require or verify-full. For MySQL, use either true, false, or skip-verify.
+
+# Grafana dashboards settings
+
+kubernetes_monitoring_grafana_dashboard_providers:
+  - name: 'default'
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards/default
+  - name: 'grafana-dashboards-kubernetes'
+    orgId: 1
+    folder: 'Kubernetes'
+    type: file
+    disableDeletion: true
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards/grafana-dashboards-kubernetes
+
+kubernetes_monitoring_grafana_dashboards:
+  default:
+    node-exporter:
+      gnetId: 1860
+      revision: 31
+  grafana-dashboards-kubernetes:
+    k8s-system-api-server:
+      url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-api-server.json
+      token: ''
+    k8s-system-coredns:
+      url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-coredns.json
+      token: ''
+    k8s-views-global:
+      url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-global.json
+      token: ''
+    k8s-views-namespaces:
+      url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json
+      token: ''
+    k8s-views-nodes:
+      url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-nodes.json
+      token: ''
+    k8s-views-pods:
+      url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json
+      token: ''
+
+# Grafana datasources settings
+kubernetes_monitoring_grafana_datasources:
+  - name: VictoriaMetrics
+    type: prometheus
+    url: http://vmsingle-mon-victoria-metrics-k8s-stack.monitoring.svc.cluster.local:8429
+    access: proxy
+    basicAuth: false
+    editable: true
+    isDefault: true
+  - name: Loki
+    type: loki
+    url: http://loki-gateway.monitoring.svc.cluster.local:80
+    access: proxy
+    basicAuth: false
+    editable: true
+    isDefault: false

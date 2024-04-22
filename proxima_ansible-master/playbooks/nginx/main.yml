@@ -1,0 +1,10 @@
+---
+- name: "Install nginx"
+  hosts: "{{ hostname }}"
+  gather_facts: no
+  become: yes
+
+  roles:
+    - role: nginx
+    - role: ne_nginx
+    - role: cloudflare_dns

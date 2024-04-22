@@ -1,0 +1,14 @@
+---
+# tasks file for cloudflare_dns
+- name: Add a subdomain as an A record
+  community.general.cloudflare_dns:
+    zone: "{{ item.zone }}"
+    record: "{{ item.subdomain }}"
+    type: "A"
+    state: "{{ subdomain_state | default('present') }}"
+    value: "{{ item.ip_address  }}"
+    account_email: "{{ item.email }}"
+    api_token: "{{ item.token }}" 
+  register: record
+  with_items:
+    - "{{ subdomains }}" 

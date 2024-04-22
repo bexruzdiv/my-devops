@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations: 
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    ingress.kubernetes.io/protocol: https
+    ingress.kubernetes.io/secure-backends: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    # nginx.ingress.kubernetes.io/server-snippet: "proxy_ssl_verify off;"
+
+    nginx.ingress.kubernetes.io/proxy-ssl-verify: "false"
+
+  name: bvault
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: vaults.bexruzdev.uz
+    http:
+      paths:
+      - backend:
+          service:
+            name: vault-0
+            port:
+              number: 8200
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - vaults.bexruzdev.uz
+    secretName: letsencrypt-bvault

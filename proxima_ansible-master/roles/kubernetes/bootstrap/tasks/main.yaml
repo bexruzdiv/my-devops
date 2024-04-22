@@ -1,0 +1,16 @@
+- include_tasks: prerequisites/main.yaml
+  tags: prerequisites
+  when: kubernetes_monitoring_install_prerequisites | default(true)
+
+- name: Include Monitoring role
+  include_role:
+    name: kubernetes/monitoring
+  vars:
+    kubernetes_monitoring_install_exporters: true
+    kubernetes_monitoring_install_victoria: true
+    kubernetes_monitoring_install_grafana: true
+    kubernetes_monitoring_install_grafana_oncall: true
+    kubernetes_monitoring_install_loki: true
+    kubernetes_monitoring_install_uptime: true
+  tags: monitoring
+  when: kubernetes_monitoring_install | default(true)

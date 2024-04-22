@@ -1,0 +1,26 @@
+[Unit]
+Description=Docker Service for {{ docker_cadvisor_container_name }}
+After=docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker rm {{ docker_cadvisor_container_name }} --force
+ExecStart=-/usr/bin/docker run \
+--name {{ docker_cadvisor_container_name }} \
+--publish {{ docker_cadvisor_publish_port }}:{{ docker_cadvisor_image_port }} \
+-v {{ docker_cadvisor_root_path }}:{{ docker_cadvisor_root_path_in_docker }}:ro \
+-v {{ docker_cadvisor_runtime_path }}:{{ docker_cadvisor_runtime_path_in_docker }}:rw \
+-v {{ docker_cadvisor_system_path }}:{{ docker_cadvisor_system_path_in_docker }}:ro \
+-v {{ docker_cadvisor_library_path }}:{{ docker_cadvisor_library_path_in_docker }}:ro \
+-v {{ docker_cadvisor_device_path }}:{{ docker_cadvisor_device_path_in_docker }}:ro \
+--network {{ docker_cadvisor_network }} \
+--privileged \
+--device=/dev/kmsg \
+{{ docker_cadvisor_docker_image }}
+
+ExecStop=-/usr/bin/docker stop {{ docker_cadvisor_container_name }}
+Restart=always
+RestartSec=20s
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,16 @@
+---
+- name: Install apt packages
+  apt:
+    name: "{{ item.apt | default(item.name) }}"
+    state: "{{ item.state | default(package_state) }}"
+    update_cache: "{{ package_update_cache }}"
+    cache_valid_time: "{{ package_cache_valid_time }}"
+    install_recommends: "{{ item.apt_install_recommends | default(omit) }}"
+  with_items:
+    - "{{ package_list }}"
+
+- name: Install pip packages
+  pip:
+    name: "{{ item }}"
+    state: latest
+  loop: "{{ pip_tools }}"

@@ -1,0 +1,42 @@
+---
+- name: "Pull victoriametrics image"
+  docker_image:
+    name: "{{ victoriametrics.image }}"
+    source: pull
+  tags:
+    - install
+
+- name: Prepare folders
+  file: path="{{ item.path }}" state=directory mode="{{ item.mode }}" owner="{{ item.owner }}"
+  with_items:
+    - { "path": "/var/log/docker", "owner": "root", "mode": "0755" }
+    - {
+        "path": "/var/log/docker/victoriametrics",
+        "owner": "root",
+        "mode": "0777",
+      }
+
+- name: "Install Systemd service for victoriametrics"
+  template:
+    src: victoriametrics.j2
+    dest: "/etc/systemd/system/victoriametrics.service"
+    owner: root
+    group: root
+    mode: "0644"
+  tags:
+    - install
+
+- name: Reread systemd configs
+  systemd:
+    daemon_reload: yes
+  tags:
+    - install
+
+- name: "Enable and start victoriametrics service"
+  systemd:
+    name: "victoriametrics"
+    enabled: yes
+    state: restarted
+  tags:
+    - enable
+    - install

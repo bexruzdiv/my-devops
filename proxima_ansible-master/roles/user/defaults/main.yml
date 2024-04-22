@@ -1,0 +1,6 @@
+---
+users:
+  - name: "{{ lookup('hashi_vault', 'secret=secret/project_credentials/test:username')}}"
+    password: "{{ lookup('hashi_vault', 'secret=secret/project_credentials/test:pass')}}"
+    primary_group: "{{ lookup('hashi_vault', 'secret=secret/project_credentials/test:username')}}"
+    is_sudoer: yes

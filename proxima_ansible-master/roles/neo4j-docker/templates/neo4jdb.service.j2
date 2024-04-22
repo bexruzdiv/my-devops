@@ -1,0 +1,21 @@
+[Unit]
+Description=Docker Service for {{ docker_neo4j_container_name }}
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStartPre=-/usr/bin/docker stop {{ docker_neo4j_container_name }}
+ExecStartPre=-/usr/bin/docker rm {{ docker_neo4j_container_name }}
+ExecStart=/usr/bin/docker run --name {{ docker_neo4j_container_name }} \
+  -p {{ docker_neo4j_port }}:7474 -p {{ docker_neo4j_port2 }}:7687 \
+  -v {{ docker_neo4j_data_volume }}:{{ docker_neo4j_data_volume_in_docker }} \
+  -v {{ docker_neo4j_data_logs }}:{{ docker_neo4j_data_logs_in_docker }} \
+  -v {{ docker_neo4j_data_import }}:{{ docker_neo4j_data_import_in_docker }} \
+  -v {{ docker_neo4j_data_plugins }}:{{ docker_neo4j_data_plugins_in_docker }} \
+  --env NEO4J_AUTH={{ docker_neo4j_root_password }} \
+  {{ docker_neo4j_docker_image }}
+ExecStop=/usr/bin/docker stop {{ docker_neo4j_container_name }}
+
+[Install]
+WantedBy=multi-user.target

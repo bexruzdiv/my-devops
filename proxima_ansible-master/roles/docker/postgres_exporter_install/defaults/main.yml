@@ -1,0 +1,15 @@
+---
+docker_network:
+  - name: docker_network
+    state: present
+    driver: bridge
+
+postgres_exporter:
+  image: prometheuscommunity/postgres-exporter:latest
+  networks:
+    - docker_network
+  external_port: 9187
+  user: postgres
+  password: admin
+  postgres_host: localhost
+  postgres_port: 5432

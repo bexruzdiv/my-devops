@@ -1,0 +1,42 @@
+---
+- name: Make commonn dirs
+  file:
+    path: "{{ item.dest }}"
+    state: "{{ item.state }}"
+    mode: "0755"
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"
+  with_items:
+    - state: directory
+      dest: /var/www/{{ stack_name }}_devops
+    - state: touch
+      dest: /var/www/{{ stack_name }}_devops/.gitignore
+
+- name: Common templates
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"
+  when: item.is_enabled
+  with_items:
+    - src: templates/Makefile.j2
+      dest: /var/www/{{ stack_name }}_devops/Makefile
+      is_enabled: update_makefile
+    - src: templates/.gitlab-ci.yml.j2
+      dest: /var/www/{{ stack_name }}_devops/.gitlab-ci.yml
+      is_enabled: update_gitlab_ci_file
+    - src: templates/.env.j2
+      dest: /var/www/{{ stack_name }}_devops/.env
+      is_enabled: "True"
+
+- name: Gitignore .env
+  shell: |
+    echo ".env" >> /var/www/{{ stack_name }}_devops/.gitignore
+    echo "vault_agent/credentials/" >> /var/www/{{ stack_name }}_devops/.gitignore
+    echo "vault_agent/templates/" >> /var/www/{{ stack_name }}_devops/.gitignore
+    echo "vault_agent/config/" >> /var/www/{{ stack_name }}_devops/.gitignore
+    
+- name: Check .gitignore
+  shell: cat .gitignore | sort -u > temp; mv temp .gitignore

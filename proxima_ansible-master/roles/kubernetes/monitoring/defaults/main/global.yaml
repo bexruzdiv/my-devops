@@ -1,0 +1,29 @@
+
+### Global Settings
+
+# namespace to install monitoring stack
+kubernetes_monitoring_namespace: monitoring-test
+
+kubernetes_monitoring_ingress_class: nginx
+kubernetes_monitoring_ingress_cluster_issuer: letsencrypt-prod
+
+# Monitoring charts to install
+kubernetes_monitoring_helm_chart_urls:
+  - name: vm
+    url: https://victoriametrics.github.io/helm-charts/
+  - name: grafana
+    url: https://grafana.github.io/helm-charts
+  - name: uptime-kuma
+    url: https://dirsigler.github.io/uptime-kuma-helm
+  - name: prometheus
+    url: https://prometheus-community.github.io/helm-charts
+
+
+# At least 2 nodes should be specified
+kubernetes_monitoring_nodes:
+  - k8s-worker-0
+  - k8s-worker-1
+
+# Do not change this. It is used to label nodes for monitoring
+kubernetes_monitoring_node_label: "node-role.kubernetes.io/monitoring"
+

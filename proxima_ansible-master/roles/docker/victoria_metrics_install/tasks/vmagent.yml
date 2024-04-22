@@ -1,0 +1,48 @@
+---
+- name: "Pull vmagent image"
+  docker_image:
+    name: "{{ vmagent.image }}"
+    source: pull
+  tags:
+    - install
+
+- name: Prepare folders
+  file: path="{{ item.path }}" state=directory mode="{{ item.mode }}" owner="{{ item.owner }}"
+  with_items:
+    - { "path": "/var/log/docker", "owner": "root", "mode": "0755" }
+    - { "path": "/var/log/docker/vmagent", "owner": "root", "mode": "0777" }
+
+- name: "Send conf file for vmagent"
+  template:
+    src: prometheus.yml.j2
+    dest: "/etc/victoriametrics/prometheus.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  tags:
+    - install
+
+- name: "Install Systemd service for vmagent"
+  template:
+    src: vmagent.j2
+    dest: "/etc/systemd/system/vmagent.service"
+    owner: root
+    group: root
+    mode: "0644"
+  tags:
+    - install
+
+- name: Reread systemd configs
+  systemd:
+    daemon_reload: yes
+  tags:
+    - install
+
+- name: "Enable and start vmagent service"
+  systemd:
+    name: "vmagent"
+    enabled: yes
+    state: restarted
+  tags:
+    - enable
+    - install

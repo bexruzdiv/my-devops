@@ -1,0 +1,45 @@
+[Unit]
+Description=Docker Service for {{ victoriametrics.name }}
+After=network.service docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop -t 60 {{ victoriametrics.name }}
+ExecStartPre=-/usr/bin/docker rm {{ victoriametrics.name }}
+ExecStart=/usr/bin/docker run \
+--rm \
+--name {{ victoriametrics.name }} \
+--publish {{ victoriametrics.ports.httpListenAddr }}:8428 \
+--publish {{ victoriametrics.ports.influxListenAddr }}:8089 \
+--publish {{ victoriametrics.ports.influxListenAddr }}:8089/udp \
+--publish {{ victoriametrics.ports.graphiteListenAddr }}:2003 \
+--publish {{ victoriametrics.ports.graphiteListenAddr }}:2003/udp \
+--publish {{ victoriametrics.ports.opentsdbListenAddr }}:4242 \
+-v vmdata:/storage \
+{% if victoriametrics.networks is defined %}
+{% for network in victoriametrics.networks %}
+--network {{ network }} \
+{% endfor %}
+{% endif %}
+--log-driver 'syslog' \
+--log-opt 'tag={{ victoriametrics.name }}' \
+{{ victoriametrics.image }} \
+--storageDataPath=/storage \
+--graphiteListenAddr=:2003 \
+--opentsdbListenAddr=:4242 \
+--httpListenAddr=:8428 \
+--influxListenAddr=:8089 \
+--vmalert.proxyURL=http://{{ vmalert.name }}:8880
+ExecStop=-/usr/bin/docker stop -t 60 {{ victoriametrics.name }}
+
+ExecReload=/usr/bin/docker restart '{{ victoriametrics.name }}'
+
+Restart=always
+RestartSec=20s
+
+SuccessExitStatus=SIGKILL SIGTERM 143 137
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service
+

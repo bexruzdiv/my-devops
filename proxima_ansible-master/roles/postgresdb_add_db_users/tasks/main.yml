@@ -1,0 +1,40 @@
+
+- name: Install Postgres Python library
+  apt:
+    name: python3-psycopg2
+    state: present
+
+- name: Create databases and users
+  block:
+    - name: Create database
+      postgresql_db:
+        login_host: localhost
+        login_user: "{{postgres_admin_user}}"
+        login_password: "{{postgres_admin_password}}"
+        port: "{{postgres_ext_port}}"
+        name: "{{ item.name }}"
+      loop: "{{ databases }}"
+
+    - name: Create user with password
+      postgresql_user:
+        login_host: localhost
+        login_user: "{{postgres_admin_user}}"
+        login_password: "{{postgres_admin_password}}"
+        port: "{{postgres_ext_port}}"
+        db: "{{ item.name }}"
+        name: "{{ item.user }}"
+        password: "{{ item.pass }}"
+      loop: "{{ databases }}"
+
+    - name: Grant all privileges to user
+      postgresql_privs:
+        login_host: localhost
+        login_user: "{{postgres_admin_user}}"
+        login_password: "{{postgres_admin_password}}"
+        port: "{{postgres_ext_port}}"
+        db: "{{postgres_admin_user}}"
+        obj: "{{ item.name }}"
+        role: "{{ item.user }}"
+        privs: ALL
+        type: database
+      loop: "{{ databases }}"

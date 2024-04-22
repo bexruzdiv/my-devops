@@ -1,0 +1,52 @@
+---
+- name: "Pull {{ item.name }} image"
+  docker_image:
+    name: "{{ item.image }}"
+    source: pull
+  tags:
+    - install
+
+- name: Prepare folders
+  file: path="{{ item.path }}" state=directory mode="{{ item.mode }}" owner="{{ item.owner }}"
+  with_items:
+    # - {
+    #     "path": "{{ docker_kafka_system_path }}",
+    #     "owner": "root",
+    #     "mode": "0755",
+    #   }
+    # - {
+    #     "path": "{{ docker_kafka_data_path }}",
+    #     "owner": "root",
+    #     "mode": "0777",
+    #   }
+    - { "path": "/var/log/docker", "owner": "root", "mode": "0755" }
+    - {
+        "path": "/var/log/docker/{{ item.name }}",
+        "owner": "root",
+        "mode": "0777",
+      }
+
+- name: "Install Systemd service for {{ item.name }}"
+  template:
+    src: docker_service_unit.j2
+    dest: "/etc/systemd/system/{{ item.name }}.service"
+    owner: root
+    group: root
+    mode: "0644"
+  tags:
+    - install
+
+- name: Reread systemd configs
+  systemd:
+    daemon_reload: yes
+  tags:
+    - install
+
+- name: "Enable and start {{ item.name }} service"
+  systemd:
+    name: "{{ item.name }}"
+    enabled: yes
+    state: restarted
+  tags:
+    - enable
+    - install

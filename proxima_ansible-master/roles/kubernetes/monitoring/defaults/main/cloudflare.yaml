@@ -1,0 +1,42 @@
+### Cloudflare settings
+# Monitoring domains
+kubernetes_monitoring_uptime_domain: "testuptime.{{ kubernetes_monitoring_domain }}"
+kubernetes_monitoring_alert_domain: "testalert.{{ kubernetes_monitoring_domain }}"
+kubernetes_monitoring_grafana_domain: "testgrafana.{{ kubernetes_monitoring_domain }}"
+kubernetes_monitoring_vm_domain: "testvm.{{ kubernetes_monitoring_domain }}"
+kubernetes_monitoring_minio_domain: "testminio.{{ kubernetes_monitoring_domain }}"
+kubernetes_monitoring_minioapi_domain: "testminioapi.{{ kubernetes_monitoring_domain }}"
+kubernetes_monitoring_oncall_domain: "testoncall.{{ kubernetes_monitoring_domain }}"
+
+
+kubernetes_monitoring_cloudflare_account_email: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/cloudflare:email') }}"
+kubernetes_monitoring_cloudflare_api_key: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/cloudflare:api_token') }}"
+kubernetes_monitoring_cloudflare_dns_records:
+  - key: "{{ kubernetes_monitoring_vm_domain }}"
+    value:
+      type: "A"
+      content: "{{ kubernetes_monitoring_loadbalancer_ip }}"
+  - key: "{{ kubernetes_monitoring_alert_domain }}"
+    value:
+      type: "A"
+      content: "{{ kubernetes_monitoring_loadbalancer_ip }}"
+  - key: "{{ kubernetes_monitoring_grafana_domain }}"
+    value:
+      type: "A"
+      content: "{{ kubernetes_monitoring_loadbalancer_ip }}"
+  - key: "{{ kubernetes_monitoring_uptime_domain }}"
+    value:
+      type: "A"
+      content: "{{ kubernetes_monitoring_loadbalancer_ip }}"
+  - key: "{{ kubernetes_monitoring_minio_domain }}"
+    value:
+      type: "A"
+      content: "{{ kubernetes_monitoring_loadbalancer_ip }}"
+  - key: "{{ kubernetes_monitoring_minioapi_domain }}"
+    value:
+      type: "A"
+      content: "{{ kubernetes_monitoring_loadbalancer_ip }}"
+  - key: "{{ kubernetes_monitoring_oncall_domain }}"
+    value:
+      type: "A"
+      content: "{{ kubernetes_monitoring_loadbalancer_ip }}"

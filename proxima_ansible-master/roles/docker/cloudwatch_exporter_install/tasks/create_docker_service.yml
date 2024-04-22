@@ -1,0 +1,58 @@
+---
+- name: "Pull cloudwatch-exporter image"
+  docker_image:
+    name: "{{ cloudwatch_exporter.image }}"
+    source: pull
+  tags:
+    - install
+
+- name: Prepare folders
+  file: path="{{ item.path }}" state=directory mode="{{ item.mode }}" owner="{{ item.owner }}"
+  with_items:
+    - { "path": "/var/log/docker", "owner": "root", "mode": "0755" }
+    - {
+        "path": "/var/log/docker/cloudwatch-exporter",
+        "owner": "root",
+        "mode": "0777",
+      }
+
+- name: Make directories for cloudwatch-exporter
+  file:
+    path: "{{ item.dest }}"
+    state: "{{ item.state }}"
+    mode: "0755"
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"
+  with_items:
+    - state: directory
+      dest: /etc/victoriametrics
+
+- name: "Install Systemd service for cloudwatch-exporter"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "0644"
+  with_items:
+    - src: docker_service_unit.j2
+      dest: /etc/systemd/system/cloudwatch-exporter.service
+    - src: cw_config.yml.j2
+      dest: /etc/victoriametrics/cw_config.yml
+  tags:
+    - install
+
+- name: Reread systemd configs
+  systemd:
+    daemon_reload: yes
+  tags:
+    - install
+
+- name: "Enable and start cloudwatch-exporter service"
+  systemd:
+    name: "cloudwatch-exporter"
+    enabled: yes
+    state: restarted
+  tags:
+    - enable
+    - install

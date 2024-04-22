@@ -1,0 +1,14 @@
+---
+- name: "Configure sshd server"
+  template:
+    src: "{{ ssh_sshd_template }}"
+    dest: "{{ ssh_config_path }}"
+    owner: root
+    mode: '0600'
+    validate: "{{ ssh_validate_command }}"
+    backup: yes
+
+- name: "Restart sshd service"
+  service:
+    name: sshd
+    state: restarted

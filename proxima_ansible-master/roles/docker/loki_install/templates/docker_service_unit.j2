@@ -1,0 +1,36 @@
+[Unit]
+Description=Docker Service for loki
+After=network.service docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop -t 60 loki
+ExecStartPre=-/usr/bin/docker rm loki
+ExecStart=/usr/bin/docker run \
+--rm \
+--name loki \
+--publish {{ loki.external_port }}:3100 \
+-v loki-data:/loki \
+-v /etc/victoriametrics/local-config.yml:/etc/loki/local-config.yml \
+{% if loki.networks is defined %}
+{% for network in loki.networks %}
+--network {{ network }} \
+{% endfor %}
+{% endif %}
+--log-driver 'syslog' \
+--log-opt 'tag=loki' \
+{{ loki.image }} \
+-config.file=/etc/loki/local-config.yml
+ExecStop=-/usr/bin/docker stop -t 60 loki
+
+ExecReload=/usr/bin/docker restart 'loki'
+
+Restart=always
+RestartSec=20s
+
+SuccessExitStatus=SIGKILL SIGTERM 143 137
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service
+

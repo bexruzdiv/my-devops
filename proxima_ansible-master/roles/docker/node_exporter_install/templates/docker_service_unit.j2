@@ -1,0 +1,42 @@
+[Unit]
+Description=Docker Service for node-exporter
+After=network.service docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop -t 60 node-exporter
+ExecStartPre=-/usr/bin/docker rm node-exporter
+ExecStart=/usr/bin/docker run \
+--rm \
+--name node-exporter \
+--publish {{ node_exporter.external_port }}:9100 \
+-v /proc:/host/proc:ro \
+-v /sys:/host/sys:ro \
+-v /:/rootfs:ro \
+{% if node_exporter.networks is defined %}
+{% for network in node_exporter.networks %}
+--network {{ network }} \
+{% endfor %}
+{% endif %}
+--log-driver 'syslog' \
+--log-opt 'tag=node-exporter' \
+{{ node_exporter.image }} \
+--path.procfs=/host/proc \
+--path.sysfs=/host/sys \
+--path.rootfs=/rootfs \
+--collector.filesystem.ignored-mount-points \
+"^/(sys|proc|host|dev|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)" \
+--collector.filesystem.ignored-fs-types "^(tmpfs|cgroup|nsfs|rpc_pipefs|fuse\.lxcfs)$$"
+ExecStop=-/usr/bin/docker stop -t 60 node-exporter
+
+ExecReload=/usr/bin/docker restart 'node-exporter'
+
+Restart=always
+RestartSec=20s
+
+SuccessExitStatus=SIGKILL SIGTERM 143 137
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service
+

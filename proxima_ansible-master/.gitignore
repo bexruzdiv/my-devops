@@ -1,0 +1,11 @@
+web/
+inventory/hosts
+inventory/host_vars/*
+inventory/group_vars/*
+inventory.ini
+.vscode
+a.cfg
+logs/
+.vscode
+playbook.yml
+*.DS_Store

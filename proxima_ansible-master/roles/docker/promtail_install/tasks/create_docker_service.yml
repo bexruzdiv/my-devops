@@ -1,0 +1,58 @@
+---
+- name: "Pull promtail image"
+  docker_image:
+    name: "{{ promtail.image }}"
+    source: pull
+  tags:
+    - install
+
+- name: Prepare folders
+  file: path="{{ item.path }}" state=directory mode="{{ item.mode }}" owner="{{ item.owner }}"
+  with_items:
+    - { "path": "/var/log/docker", "owner": "root", "mode": "0755" }
+    - {
+        "path": "/var/log/docker/promtail",
+        "owner": "root",
+        "mode": "0777",
+      }
+
+- name: Make directories for Promtail
+  file:
+    path: "{{ item.dest }}"
+    state: "{{ item.state }}"
+    mode: "0755"
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"
+  with_items:
+    - state: directory
+      dest: /etc/victoriametrics
+
+- name: "Install Systemd service for Promtail"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "0644"
+  with_items:
+    - src: docker_service_unit.j2
+      dest: /etc/systemd/system/promtail.service
+    - src: promtail-config.yml.j2
+      dest: /etc/victoriametrics/promtail-config.yml
+  tags:
+    - install
+
+- name: Reread systemd configs
+  systemd:
+    daemon_reload: yes
+  tags:
+    - install
+
+- name: "Enable and start promtail service"
+  systemd:
+    name: "promtail"
+    enabled: yes
+    state: restarted
+  tags:
+    - enable
+    - install

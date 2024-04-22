@@ -1,0 +1,48 @@
+# Copyright 2023 PROXIMAOPS LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- include:
+    src: tasks/exporters/install_node_exporter.yaml
+    tag: install_node_exporter
+    when: kubernetes_monitoring_install_node_exporter | default(true)
+
+- include:
+    src: tasks/exporters/install_cadvisor.yaml
+    tag: install_cadvisor
+    when: kubernetes_monitoring_install_cadvisor | default(true)
+
+- include:
+    src: tasks/exporters/install_ingress_nginx_exporter.yaml
+    tag: install_ingress_nginx_exporter
+    when: kubernetes_monitoring_install_ingress_nginx_exporter | default(true)
+
+- include:
+    src: tasks/exporters/install_postgres_exporter.yaml
+    tag: install_postgres_exporter
+    when: kubernetes_monitoring_install_postgres_exporter | default(false)
+
+- include:
+    src: tasks/exporters/install_mongo_exporter.yaml
+    tag: install_mongo_exporter
+    when: kubernetes_monitoring_install_mongo_exporter | default(false)
+
+- include:
+    src: tasks/exporters/install_nginx_exporter.yaml
+    tag: install_nginx_exporter
+    when: kubernetes_monitoring_install_nginx_exporter | default(false)
+
+- include:
+    src: tasks/exporters/install_haproxy_exporter.yaml
+    tag: install_haproxy_exporter
+    when: kubernetes_monitoring_install_haproxy_exporter | default(false)

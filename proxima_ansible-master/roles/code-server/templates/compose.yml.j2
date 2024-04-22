@@ -1,0 +1,21 @@
+---
+version: "3.6"
+services:
+{% for student in students %}
+    {{ student.name }}-code-server:
+        image: gitlab.udevs.io:5050/proxima/code-server:latest
+        container_name: {{ student.name }}-code-server
+        environment:
+            - PUID=1000
+            - PGID=1000
+            - TZ=Asia/Tashkent
+            - PASSWORD={{ student.pass }}
+            - SUDO_PASSWORD={{ student.pass }}
+            - PROXY_DOMAIN=code.udevs.io
+            - DEFAULT_WORKSPACE=/config/workspace
+        volumes:
+            - /var/www/code_server/{{ student.name }}:/config
+        ports:
+            - {{ student.port }}:8443
+        restart: unless-stopped
+{% endfor %}

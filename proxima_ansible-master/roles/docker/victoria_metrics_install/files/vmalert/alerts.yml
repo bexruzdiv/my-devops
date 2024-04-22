@@ -1,0 +1,49 @@
+groups:
+  - name: node
+    interval: 60s
+    rules:
+
+      - alert: Volume is Almost Full
+        expr: (100 - (100 * node_filesystem_avail_bytes{mountpoint!~"/tmp/.*|/snap/.*|/boot/.*|/var/.*|/run/.*"} / node_filesystem_size_bytes{mountpoint!~"/|/var/log|/home/ebs|/tmp/.*|/snap/.*|/boot/.*|/var/.*|/run/.*"})) > 80
+        for: 1m
+        labels:
+          severity: warning
+          instance: "{{ $labels.instance }}"
+        annotations:
+          message: "Mountpoint: {{ $labels.mountpoint }}\n< 20% = {{ humanize $value }}%"
+
+      - alert: HostHighCpuLoad
+        expr: 100 - (avg by(instance, job) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+        for: 1m
+        labels:
+          severity: warning
+          instance: "{{ $labels.instance }}"
+        annotations:
+          message: "> 90% = {{ humanize $value }}%"
+
+      - alert: Node is down
+        expr: up == 0
+        for: 1m
+        labels:
+          instance: "{{ $labels.instance }}"
+          severity: critical
+        annotations:
+          message: "One of host is down"
+
+
+      # - alert: PrometheusAlertmanagerNotificationFailing
+      #   expr: rate(alertmanager_notifications_failed_total[1m]) > 0
+      #   for: 1m
+      #   labels:
+      #     severity: critical
+      #   annotations:
+      #     message: "Alertmanager can not get notifications from  LABELS: {{ $labels }}"
+
+      - alert: HostOutOfMemory
+        expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
+        for: 1m
+        labels:
+          instance: "{{ $labels.instance }}"
+          severity: warning
+        annotations:
+          message: "< 10% = {{ humanize $value }}%"

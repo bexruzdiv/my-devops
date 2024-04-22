@@ -1,0 +1,11 @@
+---
+docker_network:
+  - name: docker_network
+    state: present
+    driver: bridge
+
+kuma:
+  image: louislam/uptime-kuma:1
+  networks:
+    - docker_network
+  external_port: 3003

@@ -1,0 +1,42 @@
+# -- Configures vmsingle params
+vmsingle:
+  annotations: {}
+  enabled: {{ kubernetes_monitoring_victoria_vmsingle_enabled }}
+  # spec for VMSingle crd
+  # https://docs.victoriametrics.com/operator/api.html#vmsinglespec
+  spec:
+    # image:
+    #   tag: v1.92.1
+    nodeSelector:
+      {{ kubernetes_monitoring_node_label }}: "true"
+    retentionPeriod: {{ kubernetes_monitoring_victoria_retention_period }}
+    replicaCount: {{ kubernetes_monitoring_victoria_vmsingle_replica_count }}
+    extraArgs: {}
+    storage:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ kubernetes_monitoring_victoria_vmsingle_storage_size }}
+  ingress:
+    enabled: {{ kubernetes_monitoring_victoria_vmsingle_ingress_enabled }}
+    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+    # ingressClassName: nginx
+    # Values can be templated
+    annotations:
+      kubernetes.io/ingress.class: {{ kubernetes_monitoring_ingress_class }}
+      cert-manager.io/cluster-issuer: {{ kubernetes_monitoring_ingress_cluster_issuer }}
+    labels: {}
+    path: /
+    # pathType is only for k8s > 1.19
+    pathType: Prefix
+
+    hosts:
+      - {{ kubernetes_monitoring_victoria_vmsingle_ingress_host }}
+    ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+    extraPaths: []
+    tls:
+      - secretName: {{ kubernetes_monitoring_victoria_vmsingle_ingress_tls_secret_name }}
+        hosts:
+          - {{ kubernetes_monitoring_victoria_vmsingle_ingress_host }}

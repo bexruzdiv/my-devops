@@ -1,0 +1,21 @@
+---
+postgres:
+  version: 15
+  password_set: true
+  password_change: false
+  password_old: ""
+  password_new: admin
+  timezone: Asia/Tashkent
+  port: 30032
+
+  # Variables for adding new users and databases
+  databases:
+    {}
+    # - user_name: service
+    #   db_name: service
+    #   user_password: pass
+    #   super_user: yes
+    # - user_name: service2
+    #   db_name: service2
+    #   user_password: pass2
+    #   super_user: no

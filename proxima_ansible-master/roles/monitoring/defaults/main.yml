@@ -1,0 +1,78 @@
+---
+monitoring_stack_name: "test"
+user_name: "{{ ansible_user }}"
+user_primary_group: "{{ ansible_user }}"
+grafana:
+  enable: true
+  version: "8.3.3"
+  admin_password: "admin"
+  external_port: 3000
+  data_sources:
+    prometheus:
+      enable: true
+      list:
+        - name: Prometheus
+          url: http://prometheus:9090
+    loki:
+      enable: true
+      list:
+        - name: Loki
+          url: http://loki:3100
+  dashboards:
+    node_exporter: yes
+    postgres_exporter: yes
+    cadvisor_exporter: yes
+
+prometheus:
+  enable: true
+  version: "v2.33.5"
+  external_port: 9090
+  exporter_monitoring_group: "paynet_monitoring"
+  exporters:
+    - jobname: node
+      exporter:
+        - targets: "node-exporter:9100" # ne-paynet.udevs.io:80
+        - targets: "test.ne-paynet.udevs.io:80"
+        - targets: "ne-paynet.udevs.io:80"
+    - jobname: postgres
+      exporter:
+        - targets: "postgres-exporter:9187" # pe-paynet.udevs.io:80
+        - targets: "test.pe-paynet.udevs.io:80"
+        - targets: "pe-paynet.udevs.io:80"
+
+loki:
+  enable: true
+  version: "1.4.1"
+  external_port: 3100
+
+promtail:
+  enable: true
+  version: "1.4.1"
+  loki_path: "http://{{ ansible_host }}:3100/loki/api/v1/push"
+
+node_exporter:
+  enable: true
+  version: "latest"
+  external_port: 9100
+
+postgres_exporter:
+  enable: true
+  version: "v0.9.0"
+  external_port: 9187
+  user: "postgres"
+  password: "admin"
+  postgres_host: "{{ ansible_host }}"
+  postgres_port: 5432
+
+alertmanager:
+  enable: true
+  version: "latest"
+  external_port: 9093
+  bot_token: sdfsdfsdfsdf
+  chat_id: 45135
+  receiver_name: "alertmanager-receiver"
+
+cadvisor:
+  enable: true
+  version: "latest"
+  external_port: 8091

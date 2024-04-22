@@ -1,0 +1,7 @@
+---
+region: ap-south-1
+metrics:
+ - aws_namespace: AWS/ApplicationELB
+   aws_metric_name: RequestCount
+   aws_dimensions: [TargetGroup, LoadBalancer, AvailabilityZone]
+   aws_statistics: [Sum]

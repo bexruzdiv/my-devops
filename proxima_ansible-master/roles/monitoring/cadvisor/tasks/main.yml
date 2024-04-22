@@ -1,0 +1,20 @@
+---
+
+- name: Install docker-cadvisor
+  template:
+    src: "{{ docker_cadvisor_systemd_service_template }}"
+    dest: "{{ docker_cadvisor_systemd_service_path }}/{{ docker_cadvisor_systemd_service_name }}.service"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Create a network
+  docker_network:
+    name: "{{ docker_cadvisor_network }}"
+
+- name: Start and enable service
+  systemd:
+    daemon_reload: yes
+    name: "{{ docker_cadvisor_systemd_service_name }}"
+    state: restarted
+    enabled: yes

@@ -1,0 +1,23 @@
+ # Stanza name
+[{{ pgbackrest_stanza_name }}]
+# Postgresql data path
+pg1-path={{ pgbackrest_psql_data_dir }}
+pg1-port={{ pgbackrest_psql_port }}
+
+ # Global configurations
+[global]
+# Path of local repository for saving backups
+repo1-path={{ pgbackrest_backup_dir }}
+repo1-retention-diff={{ pgbackrest_diff_backup_retention }}
+repo1-retention-full={{ pgbackrest_full_backup_retention }}
+archive-async          = y
+archive-push-queue-max = 500MB
+spool-path             = /var/spool/pgbackrest
+archive-get-queue-max  = 32MB
+
+[global:archive-push]
+compress-level={{ pgbackrest_compress_level }}
+process-max=8
+
+[global:archive-get]
+process-max=4

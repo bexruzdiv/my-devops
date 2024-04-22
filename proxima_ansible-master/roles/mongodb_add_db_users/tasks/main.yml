@@ -1,0 +1,17 @@
+# - name: Install pip pymongo
+#   pip:
+#     name: pymongo
+#     state: latest
+#     executable: pip3
+
+- name: Create mongo database
+  mongodb_user:
+    login_user: "{{ mongo_admin_user }}"
+    login_port: "{{ mongo_ext_port }}"
+    login_password: "{{ mongo_admin_password }}"
+    database: "{{ item.key }}"
+    name: "{{ item.key }}"
+    password: "{{ item.value }}"
+    roles: readWrite
+    state: present
+  with_dict: "{{ db_passwords }}"

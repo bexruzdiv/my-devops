@@ -1,0 +1,21 @@
+---
+harbor:
+  package_url: https://github.com/goharbor/harbor/releases/download/v2.8.2/harbor-online-installer-v2.8.2.tgz
+
+  harbor_initial_data_folder: '/var/lib/harbor'
+
+  folders:
+    base_folder:
+      path: "/root/harbor"
+      owner: "1000"
+      group: "1000"
+
+    setup_folder:
+      path: "/root/harbor/setup"
+      owner: "1000"
+      group: "1000"
+
+    data_folder:
+      path: "/root/harbor/data"
+      owner: "1000"
+      group: "1000"

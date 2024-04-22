@@ -1,0 +1,31 @@
+- name: Generate postgresDB systemd file
+  template:
+    src: "{{ docker_postgresdb_systemd_service_template }}"
+    dest: "{{ docker_postgresdb_systemd_service_path }}/{{ docker_postgresdb_container_name }}.service"
+    mode: 0744
+
+- name: Enable and start postgresDB service
+  systemd:
+    daemon_reload: yes
+    name: "{{ docker_postgresdb_systemd_service_name }}"
+    enabled: yes
+    state: restarted
+
+- name: Creating link for data dir
+  when: docker_postgresdb_data_volume != docker_postgresdb_data_volume_in_docker
+  block:
+    - name: Create directories
+      file:
+        path: "{{ item.path }}"
+        state: "{{ item.state }}"
+        mode: "{{ item.mode|default(omit) }}"
+      loop:
+        - { path: /var/lib, state: directory}
+        - { path: /var/lib/postgresql, state: directory}
+      loop_control:
+        loop_var: item 
+    - name: Create link file
+      file:
+        src: "{{ docker_postgresdb_data_volume }}"
+        dest: "{{ docker_postgresdb_data_volume_in_docker }}"
+        state: link

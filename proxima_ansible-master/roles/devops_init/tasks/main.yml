@@ -1,0 +1,35 @@
+---
+- name: TASK - Create common devops files
+  include_tasks: common-files.yml
+
+- name: TASK - VAULT AGENT
+  include_tasks: vault-agent.yml
+  when: vault_agent.enabled
+
+- name: TASK - VAULT
+  include_tasks: vault.yml
+  when: vault.enabled
+
+- name: TASK - Services
+  include_tasks: services.yml
+  when: generate_services_docker_compose
+
+- name: TASK - Minio
+  include_tasks: minio.yml
+  when: minio.enabled
+
+- name: TASK - RMQ
+  include_tasks: rmq.yml
+  when: rmq.enabled
+
+- name: TASK - Mongo
+  include_tasks: mongo_docker.yml
+  when: mongo_docker.enabled
+
+- name: TASK - Redis
+  include_tasks: redis.yml
+  when: redis.enabled
+
+- name: TASK - Kafka
+  include_tasks: kafka.yml
+  when: kafka.enabled

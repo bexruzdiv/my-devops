@@ -1,0 +1,20 @@
+[Unit]
+Description=Docker Service for {{ docker_node_exporter_container_name }}
+After=docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker rm {{ docker_node_exporter_container_name }} --force
+ExecStart=-/usr/bin/docker run \
+--name {{ docker_node_exporter_container_name }} \
+--net="host" \
+--pid="host" \
+-v {{ docker_node_exporter_root_path }}:{{ docker_node_exporter_root_path_in_docker }}:ro,rslave \
+{{ docker_node_exporter_docker_image }} --path.rootfs={{ docker_node_exporter_root_path_in_docker }}
+
+ExecStop=-/usr/bin/docker stop {{ docker_node_exporter_container_name }}
+Restart=always
+RestartSec=20s
+
+[Install]
+WantedBy=multi-user.target

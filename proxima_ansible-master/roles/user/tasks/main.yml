@@ -1,0 +1,29 @@
+---
+- name: "Adding new group"
+  group:
+    name: "{{ user.primary_group }}"
+    state: present
+  with_dict: "{{ user }}"
+
+- name: "Adding new user"
+  user:
+    name: "{{ user.name }}"
+    group: "{{ user.primary_group }}"
+    create_home: yes
+    password: "{{ user.password | password_hash('sha512') }}"
+
+
+- name: "Adding user to sudo group"
+  user:
+    name: "{{ user.name }}"
+    groups: sudo
+    append: yes
+  when: "{{ user.is_sudoer }}"
+
+
+- name: Modify sudoers file
+  lineinfile:
+    path: /etc/sudoers
+    line: "{{ user.name }}   ALL=(ALL) NOPASSWD:ALL"
+  when: "{{ user.is_sudoer }}"
+

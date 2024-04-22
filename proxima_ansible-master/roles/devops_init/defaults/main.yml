@@ -1,0 +1,150 @@
+---
+user_name: ubuntu
+user_primary_group: ubuntu
+docker_compose_version: 3.6
+registry: gitlab.udevs.io:5050
+gitlab_group: paynet
+stack_name: testdir
+image_tag: test
+logging: loki
+loki_path: "http://{{ ansible_host }}:3100/loki/api/v1/push"
+
+gitlab_url: gitlab.udevs.io
+gitlab_runner_image: gitlab.udevs.io:5050/docker/docker:dind
+devops_repo: "git@gitlab.udevs.io:paynet/test_devops.git"
+
+generate_makefile: true
+generate_gitlab_ci_file: true
+generate_services_docker_compose: false
+
+vault_url: vault.ccnis.uz
+vault_project_name: qurilish
+vault_credentials:
+  role_id: hfghf
+  secret_id: fsdfsd
+
+vault_agent:
+  enabled: false
+  image: hashicorp/vault-enterprise:latest
+  external_port: 18200
+
+vault:
+  enabled: false
+  version: 1.12.0
+  external_port: 8200
+  postgres_connection: postgres://vault:VsLojdKfredG@10.100.100.39:5432/vault?sslmode=disable
+
+minio:
+  enabled: false
+  access_key: ACCESS_KEY
+  secret_key: SECRET_KEY
+  version: RELEASE.2020-05-29T14-08-49Z
+  external_port: 9000
+
+rmq:
+  enabled: false
+  version: 3.10.7-management
+  user: admin
+  pass: admin222
+  external_port: 5672
+  external_port_ui: 15672
+
+mongo_docker:
+  enabled: false
+  version: 6.0.2
+  user: adminm
+  pass: adminmongo
+  external_port: 27017
+  volume: mongo_data
+
+redis:
+  enabled: false
+  version: 6.2-alpine
+  pass: adminredis
+  external_port: 6379
+  volume: redis_data
+  loglevel: info
+
+kafka:
+  enabled: false
+  version: 3.2.1
+  external_port: 9092
+
+cassandra:
+  enabled: false
+  version: 4.0.7
+  external_port: 9042
+  volume: cassandra_data
+  user: zafar
+  pass: zafar
+
+clickhouse:
+  enabled: false
+  version: 21.3
+  external_port: 9000
+  volume: clickhouse_data
+  user: zafar
+  pass: zafar
+  db: zafar
+
+dotenv_vars:
+  - NIMADIR=nimadir
+
+services:
+  agent_api_gateway:
+    loki: yes
+    vault_options:
+      - postgres
+      - minio
+    generate_image: yes
+    generate_vault_env: yes
+    compose: |
+      environment:
+            - KEY=value
+            - KEY=value
+            - KEY=value
+          nimadir: Nimaladir
+          ports:
+            - 8080:80
+            - 8081:8080
+          deploy:
+            server:
+              replica: 10
+              names:
+                - name1
+                - name2
+            node: Server
+          ports_again:
+            - 8080:80
+  paynet_service:
+    loki: yes
+    generate_image: yes
+    generate_vault_env: yes
+    compose: |
+      volumes:
+            - secrets:/secrets:ro
+          ports:
+            - 8092:8080
+            - 8092:8080
+            - 8092:8080
+          porrrts:
+            - 8092:8080
+            - 8092:8080
+            - 8092:8080
+  pdddt_service:
+    loki: yes
+    vault_options:
+      - minio
+    generate_image: yes
+    generate_vault_env: yes
+    compose: |
+      volumes:
+            - secrets:/secrets:ro
+          environment:
+            - KEY=value
+          ports:
+            - 8092:8080
+            - 8092:8080
+            - 8092:8080
+volumes:
+  secrets:

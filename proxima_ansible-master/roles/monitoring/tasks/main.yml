@@ -1,0 +1,69 @@
+---
+- name: Make dir /home/{{ user_name }}/{{ item.dest }}
+  file:
+    path: "{{ item.dest }}"
+    state: "{{ item.state }}"
+    mode: "0755"
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"
+  with_items:
+    - state: directory
+      dest: /home/{{ user_name }}/tmp
+
+- name: Check Swarm init
+  include_role:
+    name: docker_swarm_init_check
+
+- name: Docker compose up GRAFANA
+  include_tasks: grafana.yml
+  when: grafana.enable
+
+- name: Docker compose up PROMETHEUS
+  include_tasks: prometheus.yml
+  when: prometheus.enable
+
+- name: Docker compose up ALERTMANAGER
+  include_tasks: alertmanager.yml
+  when: alertmanager.enable
+
+- name: Docker compose up LOKI
+  include_tasks: loki.yml
+  when: loki.enable
+
+- name: Docker compose up PROMTAIL
+  include_tasks: promtail.yml
+  when: promtail.enable
+
+- name: Docker compose up NODE-EXPORTER
+  include_tasks: node-exporter.yml
+  when: node_exporter.enable
+
+- name: Docker compose up POSTGRES-EXPORTER
+  include_tasks: postgres-exporter.yml
+  when: postgres_exporter.enable
+
+- name: Docker compose up CADVISOR
+  include_tasks: cadvisor.yml
+  when: cadvisor.enable
+
+- name: Add Datasource | PROMETHEUS
+  include_tasks: prometheus-ds.yml
+  with_items: "{{ grafana.data_sources.prometheus.list }}"
+  when: grafana.data_sources.prometheus.enable
+
+- name: Add Datasource | LOKI
+  include_tasks: loki-ds.yml
+  with_items: "{{ grafana.data_sources.loki.list }}"
+  when: grafana.data_sources.loki.enable
+
+- name: Add Dashboard | NODE_EXPORTER
+  include_tasks: dashboard-ne.yml
+  when: grafana.dashboards.node_exporter
+
+- name: Add Dashboard | POSTGRES_EXPORTER
+  include_tasks: dashboard-pe.yml
+  when: grafana.dashboards.postgres_exporter
+
+- name: Add Dashboard | CADVISOR_EXPORTER
+  include_tasks: dashboard-cadvisor.yml
+  when: grafana.dashboards.cadvisor_exporter

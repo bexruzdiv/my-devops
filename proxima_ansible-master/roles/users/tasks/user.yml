@@ -1,0 +1,73 @@
+---
+
+- name: Check if user name is defined
+  fail:
+    message: "User name is required!"
+  when: not user.name is defined
+
+- name: "Check if a user or a group are defined externally for: {{ user.name }}/{{ user.group|default(user.name) }}"
+  check_if_external:
+    user: "{{ user.name }}"
+    group: "{{ user.group|default(user.name) }}"
+  register: trigger_users_external
+
+- name: "Create user: {{ user.name }}/{{ user.group|default(user.name) }}"
+  when: not user.delete|default(False)
+  block:
+    - name: "Create group for: {{ user.name }}/{{ user.group|default(user.name) }}"
+      group:
+        name: "{{ user.group|default(user.name) }}"
+        gid: "{{ user.gid|default(user.uid|default(omit)) }}"
+      when: not user.group_skip|default(False)|bool and not trigger_users_external.group_external|bool
+
+    - name: "Create user for: {{ user.name }}/{{ user.group|default(user.name) }}"
+      user:
+        name: "{{ user.name }}"
+        group: "{{ user.group|default(user.name) }}"
+        groups: "{{ user.groups|default([])|join(',') }}"
+        shell: "{{ user.shell|default(users_default_shell) }}"
+        password: "{{ user.lock|default(False)|bool|ternary('!', user.password|default('!')) }}"
+        comment: "{{ user.comment|default(user.name) }}"
+        uid: "{{ user.uid|default(omit) }}"
+        createhome: "{{ users_create_home_dirs|bool|ternary('yes','no') }}"
+        home: "{{ user.home|default(users_home_directory + '/' + user.name) }}"
+      when: not trigger_users_external.user_external|bool
+
+    - name: "Set the home dir permissions for: {{ user.name }}/{{ user.group|default(user.name) }}"
+      file:
+        path: "{{ user.home|default(users_home_directory + '/' + user.name) }}"
+        state: directory
+        owner: "{{ user.group|default(user.name) }}"
+        group: "{{ user.name }}"
+        mode: '0750'
+
+    - name: "Assign external user to local groups for: {{ user.name }}/{{ user.group|default(user.name) }}"
+      user:
+        name: "{{ user.name }}"
+        groups: "{{ user.groups|default([])|join(',') }}"
+      when: trigger_users_external.user_external|bool
+
+    - name: "Create SSH keys for: {{ user.name }}/{{ user.group|default(user.name) }}"
+      authorized_key:
+        state: "{{ user.lock|default(False)|bool|ternary('absent','present') }}"
+        user: "{{ user.name }}"
+        key: "{{ item }}"
+        path: "{{ user.home|default('/home/' + user.name) + '/.ssh/authorized_keys' }}"
+      with_items:
+        - "{{ user.ssh_key|default([]) }}"
+      when: not trigger_users_external.user_external|bool
+
+- name: "Remove user: {{ user.name }}/{{ user.group|default(user.name) }}"
+  when: user.delete|default(False)
+  block:
+    - name: "Deleted user removal for: {{ user.name }}/{{ user.group|default(user.name) }}"
+      user:
+        name: "{{ user.name }}"
+        state: absent
+      when: not trigger_users_external.user_external
+
+    - name: "Deleted group removal for: {{ user.name }}/{{ user.group|default(user.name) }}"
+      group:
+        name: "{{ user.group|default(user.name) }}"
+        state: absent
+      when: not user.group_skip|default(False)|bool and not user.group_keep|default(False)|bool and not trigger_users_external.group_external|bool

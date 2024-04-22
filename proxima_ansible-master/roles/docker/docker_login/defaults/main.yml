@@ -1,0 +1,6 @@
+---
+# defaults file for docker_login
+docker_login:
+  registry: your.private.registry.io
+  username: yourself
+  password: secrets3

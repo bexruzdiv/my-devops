@@ -1,0 +1,11 @@
+---
+docker_network:
+  - name: docker_network
+    state: present
+    driver: bridge
+
+loki:
+  image: grafana/loki:latest
+  networks:
+    - docker_network
+  external_port: 3100

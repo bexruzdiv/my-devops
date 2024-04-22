@@ -1,0 +1,10 @@
+---
+
+ssh_sshd_template: sshd_config.j2
+ssh_config_path: /etc/ssh/sshd_config
+ssh_validate_command: /usr/sbin/sshd -t -f %s
+ssh_listen_port: 22
+ssh_permit_root_login: "yes"
+ssh_max_auth_retries: 5
+ssh_pubkey_auth: "yes"
+ssh_password_auth: "no"

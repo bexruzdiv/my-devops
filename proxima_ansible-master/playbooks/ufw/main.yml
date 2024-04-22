@@ -1,0 +1,8 @@
+---
+- name: "Install ufw firewall"
+  hosts: "{{ hostname }}"
+  gather_facts: yes
+  become: yes
+  
+  roles:
+    - { role: ufw, when: ufw_enabled }

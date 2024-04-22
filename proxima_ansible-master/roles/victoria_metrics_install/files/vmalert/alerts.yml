@@ -1,0 +1,74 @@
+groups:
+  - name: node
+    interval: 60s
+    rules:
+      - alert: HostOutOfDiskSpace
+        expr: (100 - (100 * node_filesystem_avail_bytes{mountpoint="/", instance!="Shipox-Frontend"} / node_filesystem_size_bytes{mountpoint="/", instance!="Shipox-Frontend"})) > 90
+        for: 1m
+        labels:
+          severity: warning
+          instance: "{{ $labels.instance }}"
+        annotations:
+          message: "< 10% = {{ humanize $value }}%"
+
+      - alert: Volume Of Logs is Almost Full
+        expr: (100 - (100 * node_filesystem_avail_bytes{mountpoint="/var/log", instance!="Shipox-Frontend"} / node_filesystem_size_bytes{mountpoint="/var/log", instance!="Shipox-Frontend"})) > 80
+        for: 1m
+        labels:
+          severity: warning
+          instance: "{{ $labels.instance }}"
+        annotations:
+          message: "< 20% = {{ humanize $value }}%"
+
+      - alert: HostHighCpuLoad
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+        for: 1m
+        labels:
+          severity: warning
+          instance: "{{ $labels.instance }}"
+        annotations:
+          message: "> 90% = {{ humanize $value }}%"
+
+      - alert: Node is down
+        expr: up{job="shipox_nodes"} == 0
+        for: 1m
+        labels:
+          instance: "{{ $labels.instance }}"
+          severity: critical
+        annotations:
+          message: "One of host is down"
+
+      - alert: Node is down
+        expr: up{job="sa_nodes"} == 0
+        for: 1m
+        labels:
+          instance: "{{ $labels.instance }}"
+          severity: critical
+        annotations:
+          message: "One of host is down"
+
+      # - alert: PrometheusAlertmanagerNotificationFailing
+      #   expr: rate(alertmanager_notifications_failed_total[1m]) > 0
+      #   for: 1m
+      #   labels:
+      #     severity: critical
+      #   annotations:
+      #     message: "Alertmanager can not get notifications from  LABELS: {{ $labels }}"
+
+      - alert: HostOutOfMemory
+        expr: node_memory_MemAvailable_bytes{instance!="Shipox-ORS-Prod"} / node_memory_MemTotal_bytes{instance!="Shipox-ORS-Prod"} * 100 < 10
+        for: 1m
+        labels:
+          instance: "{{ $labels.instance }}"
+          severity: warning
+        annotations:
+          message: "< 10% = {{ humanize $value }}%"
+
+      - alert: HostOutOfMemory
+        expr: node_memory_MemAvailable_bytes{job="shipox_prod_app"} / node_memory_MemTotal_bytes{job="shipox_prod_app"} * 100 < 30
+        for: 1m
+        labels:
+          instance: "{{ $labels.instance }}"
+          severity: warning
+        annotations:
+          message: "< 30% = {{ humanize $value }}%"

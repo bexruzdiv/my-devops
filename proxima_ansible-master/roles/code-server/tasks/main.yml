@@ -1,0 +1,10 @@
+- name: Code server template
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+    owner: "ubuntu"
+    group: "ubuntu"
+  with_items:
+    - src: templates/compose.yml.j2
+      dest: /var/www/bootcamp_devops/docker-compose.yml

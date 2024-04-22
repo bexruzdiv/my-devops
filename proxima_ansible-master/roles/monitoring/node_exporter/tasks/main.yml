@@ -1,0 +1,16 @@
+---
+
+- name: Install docker-node-exporter
+  template:
+    src: "{{ docker_node_exporter_systemd_service_template }}"
+    dest: "{{ docker_node_exporter_systemd_service_path }}/{{ docker_node_exporter_systemd_service_name }}.service"
+    owner: root
+    group: root
+    mode: 0644
+    
+- name: Start and enable service
+  systemd:
+    daemon_reload: yes
+    name: "{{ docker_node_exporter_systemd_service_name }}"
+    state: restarted
+    enabled: yes

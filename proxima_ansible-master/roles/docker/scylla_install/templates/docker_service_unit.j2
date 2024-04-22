@@ -1,0 +1,33 @@
+[Unit]
+Description=Docker Service for scylla
+After=network.service docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop -t 60 scylla
+ExecStartPre=-/usr/bin/docker rm scylla
+ExecStart=/usr/bin/docker run \
+--rm \
+--name scylla \
+--hostname scylla \
+-v scylla-data:/home/ebs/scylla \
+-v /etc/scylla.yaml:/etc/scylla/scylla.yaml \
+{% if scylla.networks is defined %}
+{% for network in scylla.networks %}
+--network {{ network }} \
+{% endfor %}
+{% endif %}
+--log-driver 'syslog' \
+--log-opt 'tag=scylla' \
+{{ scylla.image }} 
+
+ExecReload=/usr/bin/docker restart 'scylla'
+
+Restart=always
+RestartSec=20s
+
+SuccessExitStatus=SIGKILL SIGTERM 143 137
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service

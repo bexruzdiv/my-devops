@@ -1,0 +1,41 @@
+[Unit]
+Description=Docker Service for prometheus
+After=network.service docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop -t 60 prometheus
+ExecStartPre=-/usr/bin/docker rm prometheus
+ExecStart=/usr/bin/docker run \
+--rm \
+--name prometheus \
+--publish {{ prometheus.external_port }}:9090 \
+-v /home/{{ prometheus.user_name }}/tmp/alert_rules.yml:/etc/prometheus/alert_rules.yml \
+-v /home/{{ prometheus.user_name }}/tmp/elasticsearch_rules.yml:/etc/prometheus/elasticsearch.rules \
+-v /home/{{ prometheus.user_name }}/tmp/prometheus.yml:/etc/prometheus/prometheus.yml \
+-v prometheus:/prometheus \
+{% if prometheus.networks is defined %}
+{% for network in prometheus.networks %}
+--network {{ network }} \
+{% endfor %}
+{% endif %}
+--log-driver 'syslog' \
+--log-opt 'tag=prometheus' \
+{{ prometheus.image }} \
+--path.procfs=/host/proc \
+--path.sysfs=/host/sys \
+--collector.filesystem.ignored-mount-points \
+"^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+ExecStop=-/usr/bin/docker stop -t 60 prometheus
+
+ExecReload=/usr/bin/docker restart 'prometheus'
+
+Restart=always
+RestartSec=20s
+
+SuccessExitStatus=SIGKILL SIGTERM 143 137
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service
+

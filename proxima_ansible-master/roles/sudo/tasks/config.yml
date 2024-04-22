@@ -1,0 +1,10 @@
+---
+
+- name: Deploy the sudoers file
+  template:
+    src: sudoers.j2
+    dest: "{{ sudo_config_file_path }}"
+    owner: root
+    group: root
+    mode: 0440
+    validate: "{{ sudo_validate_command }}"

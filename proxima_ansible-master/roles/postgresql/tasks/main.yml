@@ -1,0 +1,89 @@
+---
+- name: Update apt repo and cache on all Ubuntu boxes
+  apt:
+    update_cache: yes
+    force_apt_get: yes
+    cache_valid_time: 3600
+
+- name: Upgrade all packages on servers
+  apt:
+    upgrade: dist
+    force_apt_get: yes
+
+- name: Install required packages
+  apt:
+    name:
+      - wget
+      - python3-psycopg2
+      - acl
+    state: latest
+
+- name: Set up Postgres {{ postgres.version }} repo
+  shell: |
+    echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+  args:
+    warn: no
+
+- name: Install postgresql
+  apt:
+    name: postgresql-{{ postgres.version }}
+    update_cache: yes
+  notify:
+    - Enable Postgresql
+
+- name: Set password to user postgres
+  become: yes
+  become_method: sudo
+  become_user: postgres
+  postgresql_query:
+    db: postgres
+    query: "ALTER USER postgres WITH PASSWORD '{{ postgres.password_new }}';"
+  when: postgres.password_set
+  notify: Restart Postgresql
+
+- name: Ensure PostgreSQL is listening on *
+  lineinfile:
+    dest: /etc/postgresql/{{ postgres.version }}/main/postgresql.conf
+    regexp: '^#{0,1}listen_addresses\s*='
+    line: "listen_addresses = '*'"
+    state: present
+  notify: Restart Postgresql
+
+- name: Set postgresql port to {{ postgres.port }}
+  lineinfile:
+    dest: /etc/postgresql/{{ postgres.version }}/main/postgresql.conf
+    regexp: "^port"
+    line: "port = {{ postgres.port }}"
+    state: present
+  notify: Restart Postgresql
+
+- name: Set log_timezone to {{ postgres.timezone }}
+  lineinfile:
+    dest: /etc/postgresql/{{ postgres.version }}/main/postgresql.conf
+    regexp: "^log_timezone"
+    line: "log_timezone = {{ postgres.timezone }}"
+    state: present
+  notify: Restart Postgresql
+
+- name: Set timezone to {{ postgres.timezone }}
+  lineinfile:
+    dest: /etc/postgresql/{{ postgres.version }}/main/postgresql.conf
+    regexp: "^timezone"
+    line: "timezone = {{ postgres.timezone }}"
+    state: present
+  notify: Restart Postgresql
+
+- name: Delete configuration "pg_hba.conf"
+  file:
+    path: /etc/postgresql/{{ postgres.version }}/main/pg_hba.conf
+    state: absent
+
+- name: Copy configuration "pg_hba.conf"
+  copy:
+    src: files/pg_hba.conf
+    dest: /etc/postgresql/{{ postgres.version }}/main/pg_hba.conf
+    owner: postgres
+    group: postgres
+    mode: "0640"
+  notify: Restart Postgresql

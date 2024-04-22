@@ -1,0 +1,7 @@
+---
+- name: "Install neo4j in docker with systemd"
+  hosts: "{{ hostname }}"
+  gather_facts: yes
+  become: yes
+  roles:
+    - role: neo4j-docker

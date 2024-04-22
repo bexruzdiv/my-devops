@@ -1,0 +1,16 @@
+---
+- name: Make dir Kafka
+  file:
+    path: /var/www/{{ stack_name }}_devops/kafka
+    state: directory
+    mode: "0755"
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"
+    
+- name: KAFKA | Send template files
+  template:
+    src: templates/kafka.yml.j2
+    dest: /var/www/{{ stack_name }}_devops/kafka/kafka.yml
+    mode: 0644
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"

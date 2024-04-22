@@ -1,0 +1,21 @@
+---
+- name: "Bootstrap the server"
+  hosts: "{{ hostname }}"
+  gather_facts: yes
+  become: yes
+
+  roles:
+    - role: common
+    - role: hostname
+    - role: ssh
+    - role: users
+    - role: sudo
+    - role: zsh
+    - role: teleport
+    - role: tools/docker
+    - role: monitoring/cadvisor
+    - role: monitoring/node_exporter
+    # - role: nginx
+    # - role: ne_nginx
+    # - role: cloudflare_dns
+    # - { role: ufw, when: ufw_enabled }

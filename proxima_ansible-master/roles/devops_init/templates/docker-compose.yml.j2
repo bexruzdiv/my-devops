@@ -1,0 +1,28 @@
+version: "{{ docker_compose_version }}"
+
+{% if logging == "loki" %}
+x-logging:
+  &loki
+  logging:
+    driver: loki
+    options:
+      loki-url: {{ loki_path }}
+      loki-batch-size: "400"
+      loki-retries: "5"
+      max-size: "100m"
+      max-file: "1"
+{% endif %}
+
+services:
+{% for key, value in services.items() %}
+  {{ key }}:
+{% if value.loki %}
+    <<: *loki
+{% endif %}
+{% if value.generate_image %}
+    image: {{ registry }}/{{ gitlab_group }}/{{ stack_name }}_{{ key }}:{{ image_tag }}
+{% endif %}
+{% if value.compose is defined %}
+    {{ value.compose }}
+{% endif %}
+{% endfor %}

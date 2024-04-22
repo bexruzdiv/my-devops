@@ -1,0 +1,44 @@
+package_list:
+  - name: apt-transport-https
+  - name: ca-certificates
+  - name: curl
+  - name: software-properties-common
+  - name: python3-pip
+  - name: virtualenv
+  - name: python3-setuptools
+  - name: git
+  - name: netstat
+    apt: net-tools
+  - name: htop
+  - name: stress
+  - name: vim
+  - name: fio
+  - name: tmux
+  - name: zsh
+  - name: wget
+  - name: zip
+  - name: gcc
+  - name: build-essential
+  - name: make
+  - name: ranger
+  - name: tree
+  - name: neofetch 
+  - name: certbot
+  - name: python3-certbot-nginx
+  - name: jq
+  - name: lsb-release
+  - name: gnupg
+  - name: fzf
+
+pip_tools:
+  - jsondiff
+  - docker-py
+  - pyaml-env
+
+package_state: present
+
+# Update cache?
+package_update_cache: yes
+
+# Cache valid time
+package_cache_valid_time: 3600

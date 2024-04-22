@@ -1,0 +1,25 @@
+---
+# defaults file for docker_run
+docker_network:
+  - name: docker_network
+    state: present
+    driver: bridge
+
+# docker_volume:
+#   - name: docker_volume
+#     state: present
+
+docker_service:
+  - name: nginx
+    image: nginx
+    networks:
+      - docker_network
+    ports:
+      - 80:80
+    volumes:
+      []
+      # - /etc:/etc/test
+    environments:
+      []
+      # - USER=ubuntu
+    # command: /bin/bash

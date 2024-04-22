@@ -1,0 +1,32 @@
+[Unit]
+Description=Docker Service for kuma
+After=network.service docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop -t 60 kuma
+ExecStartPre=-/usr/bin/docker rm kuma
+ExecStart=/usr/bin/docker run \
+--rm \
+--name kuma \
+--publish {{ kuma.external_port }}:3001 \
+-v uptime-kuma:/app/data \
+{% if kuma.networks is defined %}
+{% for network in kuma.networks %}
+--network {{ network }} \
+{% endfor %}
+{% endif %}
+--log-driver 'syslog' \
+--log-opt 'tag=kuma' \
+{{ kuma.image }}
+
+ExecReload=/usr/bin/docker restart 'kuma'
+
+Restart=always
+RestartSec=20s
+
+SuccessExitStatus=SIGKILL SIGTERM 143 137
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service

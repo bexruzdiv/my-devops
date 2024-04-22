@@ -1,0 +1,11 @@
+---
+docker_network:
+  - name: docker_network
+    state: present
+    driver: bridge
+
+solr:
+  image: bitnami/solr:6.6.1-r0
+  networks:
+    - docker_network
+  external_port: 8983

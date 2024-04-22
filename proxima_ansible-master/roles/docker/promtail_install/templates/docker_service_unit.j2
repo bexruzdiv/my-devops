@@ -1,0 +1,41 @@
+[Unit]
+Description=Docker Service for promtail
+After=network.service docker.service
+Requires=docker.service
+
+[Service]
+ExecStartPre=-/usr/bin/docker stop -t 60 promtail
+ExecStartPre=-/usr/bin/docker rm promtail
+ExecStart=/usr/bin/docker run \
+--rm \
+--name promtail \
+-v /var/log:/var/log:ro \
+-v /etc/victoriametrics/promtail-config.yml:/etc/promtail/promtail-config.yml \
+{% if promtail.additional_volumes is defined %}
+{% for volume in promtail.additional_volumes %}
+-v {{ volume }} \
+{% endfor %}
+{% endif %}
+{% if promtail.networks is defined %}
+{% for network in promtail.networks %}
+--network {{ network }} \
+{% endfor %}
+{% endif %}
+--log-driver 'syslog' \
+--log-opt 'tag=promtail' \
+{{ promtail.image }} \
+-config.file=/etc/promtail/promtail-config.yml \
+-config.expand-env=true
+ExecStop=-/usr/bin/docker stop -t 60 promtail
+
+ExecReload=/usr/bin/docker restart 'promtail'
+
+Restart=always
+RestartSec=20s
+
+SuccessExitStatus=SIGKILL SIGTERM 143 137
+
+[Install]
+WantedBy=multi-user.target
+WantedBy=docker.service
+

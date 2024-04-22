@@ -1,0 +1,15 @@
+---
+
+docker_node_exporter_service_name: docker-node-exporter
+
+docker_node_exporter_systemd_service_path: /etc/systemd/system
+docker_node_exporter_systemd_service_name: "{{ docker_node_exporter_service_name }}"
+docker_node_exporter_systemd_service_template: docker-node-exporter.j2
+
+docker_node_exporter_container_name: "{{ docker_node_exporter_service_name }}"
+docker_node_exporter_image_name: quay.io/prometheus/node-exporter
+docker_node_exporter_image_version: v1.5.0 #2022-11-29
+docker_node_exporter_docker_image: "{{ docker_node_exporter_image_name }}:{{ docker_node_exporter_image_version }}"
+
+docker_node_exporter_root_path: /
+docker_node_exporter_root_path_in_docker: /host

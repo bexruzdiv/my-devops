@@ -1,0 +1,15 @@
+---
+- name: Make dir redis
+  file:
+    path: /var/www/{{ stack_name }}_devops/redis
+    state: directory
+    mode: "0755"
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"
+- name: REDIS | Send template files
+  template:
+    src: templates/redis.yml.j2
+    dest: /var/www/{{ stack_name }}_devops/redis/redis.yml
+    mode: 0644
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"

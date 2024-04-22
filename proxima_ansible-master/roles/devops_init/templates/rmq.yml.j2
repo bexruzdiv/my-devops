@@ -1,0 +1,13 @@
+---
+version: "{{ docker_compose_version }}"
+services:
+  rabbitmq:
+    image: rabbitmq: {{ rmq.version }}
+    environment:
+      - RABBITMQ_DEFAULT_USER={{ "${" }}RMQ_USERNAME{{ "}" }}
+      - RABBITMQ_DEFAULT_PASS={{ "${" }}RMQ_PASSWORD{{ "}" }}
+    ports:
+      # AMQP protocol port
+      - '{{ rmq.external_port }}:5672'
+      # HTTP management UI
+      - '{{ rmq.external_port_ui }}:15672'

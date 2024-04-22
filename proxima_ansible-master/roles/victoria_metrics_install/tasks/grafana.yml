@@ -1,0 +1,74 @@
+---
+- name: "Pull grafana image"
+  docker_image:
+    name: "{{ grafana.image }}"
+    source: pull
+  tags:
+    - install
+
+- name: Prepare folders
+  file: path="{{ item.path }}" state=directory mode="{{ item.mode }}" owner="{{ item.owner }}"
+  with_items:
+    - { "path": "/var/log/docker", "owner": "root", "mode": "0755" }
+    - { "path": "/var/log/docker/grafana", "owner": "root", "mode": "0777" }
+
+- name: Make directories for grafana
+  file:
+    path: "{{ item.dest }}"
+    state: "{{ item.state }}"
+    mode: "0755"
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"
+  with_items:
+    - state: directory
+      dest: /etc/victoriametrics/dashboards
+    - state: directory
+      dest: /etc/victoriametrics/provisioning
+    - state: directory
+      dest: /etc/victoriametrics/provisioning/dashboards
+    - state: directory
+      dest: /etc/victoriametrics/provisioning/datasources
+
+- name: Grafana | Send config files
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"
+  with_items:
+    - src: files/grafana/dashboard.yml
+      dest: /etc/victoriametrics/provisioning/dashboards/dashboard.yml
+    - src: files/grafana/datasource.yml
+      dest: /etc/victoriametrics/provisioning/datasources/datasource.yml
+    - src: files/grafana/victoriametrics.json
+      dest: /etc/victoriametrics/dashboards/victoriametrics.json
+    - src: files/grafana/vmagent.json
+      dest: /etc/victoriametrics/dashboards/vmagent.json
+    - src: files/grafana/vmalert.json
+      dest: /etc/victoriametrics/dashboards/vmalert.json
+
+- name: "Install Systemd service for grafana"
+  template:
+    src: grafana.j2
+    dest: "/etc/systemd/system/grafana.service"
+    owner: root
+    group: root
+    mode: "0644"
+  tags:
+    - install
+
+- name: Reread systemd configs
+  systemd:
+    daemon_reload: yes
+  tags:
+    - install
+
+- name: "Enable and start grafana service"
+  systemd:
+    name: "grafana"
+    enabled: yes
+    state: restarted
+  tags:
+    - enable
+    - install

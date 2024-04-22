@@ -1,0 +1,10 @@
+---
+- name: Install certbot and plugins
+  apt:
+    name: ["certbot", "python3-certbot-nginx"]
+    state: present
+  when: ansible_facts['distribution'] == "Ubuntu"
+
+- name: Set Certbot script variable.
+  set_fact:
+    certbot_script: "{{ certbot_package }}"

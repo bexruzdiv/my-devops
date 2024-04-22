@@ -1,0 +1,12 @@
+docker_clickhousedb_port: 39000
+docker_clickhousedb_root_password: nimadir
+docker_clickhousedb_container_name: clickhousedatabase
+docker_clickhousedb_data_volume: /data/clickhousedatabase
+docker_clickhousedb_data_volume_in_docker: /var/lib/clickhouse
+docker_clickhousedb_systemd_service_template: clickhousedb.service.j2
+docker_clickhousedb_systemd_service_path: /etc/systemd/system
+docker_clickhousedb_image_name: clickhouse
+docker_clickhousedb_image_version: clickhouse-server:22.8.15 
+docker_clickhousedb_docker_image: "{{ docker_clickhousedb_image_name }}/{{ docker_clickhousedb_image_version }}"
+
+docker_clickhousedb_systemd_service_name: clickhousedatabase.service

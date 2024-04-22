@@ -1,0 +1,55 @@
+vmagent:
+  enabled: {{ kubernetes_monitoring_victoria_vmagent_enabled }}
+  annotations: {}
+  # https://docs.victoriametrics.com/operator/api.html#vmagentremotewritespec
+  # defined spec will be added to the remoteWrite configuration of VMAgent
+  additionalRemoteWrites:
+    []
+    #- url: http://some-remote-write/api/v1/write
+  # spec for VMAgent crd
+  # https://docs.victoriametrics.com/operator/api.html#vmagentspec
+  spec:
+    remoteWrite: 
+      url: {{ kubernetes_monitoring_victoria_vmagent_remote_write_url }} # http://victoria-metrics-single:8429/api/v1/write
+    nodeSelector:
+      {{ kubernetes_monitoring_node_label }}: "true"
+    selectAllByDefault: true
+    scrapeInterval: 25s
+    externalLabels:
+      cluster: {{ kubernetes_bootstrap_project_name }}
+    extraArgs:
+      promscrape.streamParse: "true"
+  ingress:
+    enabled: {{ kubernetes_monitoring_victoria_vmagent_ingress_enabled }}
+    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+    # ingressClassName: nginx
+    # Values can be templated
+    annotations:
+      kubernetes.io/ingress.class: {{ kubernetes_monitoring_victoria_vmagent_ingress_class }}
+      cert-manager.io/cluster-issuer: {{ kubernetes_monitoring_victoria_vmagent_ingress_cluster_issuer }}
+    labels: {}
+    path: /
+    # pathType is only for k8s > 1.19
+    pathType: Prefix
+
+    hosts:
+      - {{ kubernetes_monitoring_victoria_vmagent_ingress_host }}
+    ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+    extraPaths: []
+    # - path: /*
+    #   backend:
+    #     serviceName: ssl-redirect
+    #     servicePort: use-annotation
+    ## Or for k8s > 1.19
+    # - path: /*
+    #   pathType: Prefix
+    #   backend:
+    #     service:
+    #       name: ssl-redirect
+    #       port:
+    #         name: service
+    tls:
+      - secretName: vmagent-ingress-tls
+        hosts:
+          - {{ kubernetes_monitoring_victoria_vmagent_ingress_host }}

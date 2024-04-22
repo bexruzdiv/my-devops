@@ -1,0 +1,33 @@
+---
+- name: Promtail | Send template file
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"
+  with_items:
+    - src: files/docker-config.yml
+      dest: /home/{{ user_name }}/tmp/docker-config.yml
+
+- name: Promtail | add loki url to file
+  blockinfile:
+    dest: /home/{{ user_name }}/tmp/docker-config.yml
+    block: |
+      clients:
+        - url: {{ promtail.loki_path }}
+    backup: yes
+
+- name: Promtail | Docker compose up
+  docker_stack:
+    state: present
+    name: "{{ monitoring_stack_name }}"
+    compose:
+      - version: "3.7"
+        services:
+          promtail:
+            image: "grafana/promtail:{{ promtail.version}}"
+            volumes:
+              - /var/lib/docker/containers:/var/lib/docker/containers
+              - /home/{{ user_name }}/tmp/docker-config.yml:/etc/promtail/docker-config.yml
+            command: -config.file=/etc/promtail/docker-config.yml

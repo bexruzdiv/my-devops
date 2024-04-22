@@ -1,0 +1,13 @@
+---
+docker_network:
+  - name: docker_network
+    state: present
+    driver: bridge
+
+rabbitmq:
+  image: heidiks/rabbitmq-delayed-message-exchange:3.6-management
+  user_name: shipox
+  password: sio8ShoM
+  networks:
+    - docker_network
+  external_port: 5672

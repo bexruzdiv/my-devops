@@ -1,0 +1,9 @@
+mongo_admin_password: Uosaivara5Iexai2meeMuPh6thee5bae
+mongo_admin_user: root
+mongo_ext_port: 30017
+db_passwords:
+  node_analytics_service: ZTUzM2YwYmYzYmIwYmRhMzEzYjA3Zjc3
+  node_content_service: N2FkZjI4Y2IxM2FkZmMyZGZkMzE2YjI3
+  node_payment_service: YTFkYmI5MDY5MTZkYWU3ODUxNDI2Y2Q0
+  node_settings_service: MTViNjcyZTNkNzc3MmY2YmMzNGZmZDhh
+  node_tariff_service: ZGY5ZmM5N2Y3MzM2MDMzMjRlNDUzYjMw

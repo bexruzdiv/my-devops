@@ -1,0 +1,15 @@
+---
+- name: Make dir Mongo
+  file:
+    path: /var/www/{{ stack_name }}_devops/mongo
+    state: directory
+    mode: "0755"
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"
+- name: MONGO | Send template files
+  template:
+    src: templates/mongo.yml.j2
+    dest: /var/www/{{ stack_name }}_devops/mongo/mongo.yml
+    mode: 0644
+    owner: "{{ user_name }}"
+    group: "{{ user_primary_group }}"

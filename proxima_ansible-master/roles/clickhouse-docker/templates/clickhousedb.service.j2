@@ -1,0 +1,16 @@
+Description=ClickHouse Docker Container for {{ docker_clickhousedb_container_name }}
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStartPre=/usr/bin/docker pull {{ docker_clickhousedb_docker_image }}
+ExecStart=/usr/bin/docker run --rm --name {{ docker_clickhousedb_container_name }} \
+  -e CLICKHOUSE_PASSWORD={{ docker_clickhousedb_root_password }} \
+  -v {{ docker_clickhousedb_data_volume }}:{{ docker_clickhousedb_data_volume_in_docker }} \
+  -p 8123:8123 -p {{ docker_clickhousedb_port }}:9000 \
+  {{ docker_clickhousedb_docker_image }} 
+ExecStop=/usr/bin/docker stop {{ docker_clickhousedb_container_name }}
+
+[Install]
+WantedBy=multi-user.target

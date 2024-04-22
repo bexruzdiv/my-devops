@@ -1,0 +1,41 @@
+### Oncall global settings
+
+kubernetes_monitoring_oncall_release_name: oncall
+kubernetes_monitoring_oncall_chart_name: grafana/oncall
+kubernetes_monitoring_oncall_chart_version: 1.3.22
+kubernetes_monitoring_oncall_setup_values_file: "{{ lookup('template', 'oncall/main.yaml') | from_yaml }}"
+
+kubernetes_monitoring_oncall_base_url: testoncall.proximaops.io
+kubernetes_monitoring_oncall_grafana_url: https://testgrafana.proximaops.io
+kubernetes_monitoring_oncall_grafana_cloud_oncall_api_url: https://oncall-prod-eu-west-0.grafana.net/oncall
+
+kubernetes_monitoring_oncall_telegram_enabled: true
+kubernetes_monitoring_oncall_telegram_token: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/oncall:telegram_bot_token') }}"
+kubernetes_monitoring_oncall_telegram_webhook_url: "https://{{ kubernetes_monitoring_oncall_base_url }}"
+
+kubernetes_monitoring_oncall_twilio_account_sid: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/twilio:account_sid') }}"
+kubernetes_monitoring_oncall_twilio_auth_token: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/twilio:auth_token') }}"
+kubernetes_monitoring_oncall_twilio_phone_number: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/twilio:phone_number') }}"
+kubernetes_monitoring_oncall_twilio_verify_sid: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/twilio:verify_sid') }}"
+kubernetes_monitoring_oncall_twilio_api_key_sid: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/twilio:api_key_sid') }}"
+kubernetes_monitoring_oncall_twilio_api_key_secret: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/twilio:api_key_secret') }}"
+
+kubernetes_monitoring_oncall_ingress_enabled: true
+
+kubernetes_monitoring_oncall_database_type: postgresql
+kubernetes_monitoring_oncall_database_host: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/oncall:postgres_host') }}"
+kubernetes_monitoring_oncall_database_port: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/oncall:postgres_port') }}"
+kubernetes_monitoring_oncall_database_name: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/oncall:postgres_dbname') }}"
+kubernetes_monitoring_oncall_database_user: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/oncall:postgres_user') }}"
+kubernetes_monitoring_oncall_database_password: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/oncall:postgres_password') }}"
+
+kubernetes_monitoring_oncall_rabbitmq_host: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/oncall:rabbitmq_host') }}"
+kubernetes_monitoring_oncall_rabbitmq_port: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/oncall:rabbitmq_port') }}"
+kubernetes_monitoring_oncall_rabbitmq_user: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/oncall:rabbitmq_user') }}"
+kubernetes_monitoring_oncall_rabbitmq_password: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/oncall:rabbitmq_password') }}"
+kubernetes_monitoring_oncall_rabbitmq_vhost:  "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/oncall:rabbitmq_vhost') }}"
+kubernetes_monitoring_oncall_rabbitmq_protocol: amqp
+
+kubernetes_monitoring_oncall_redis_host: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/oncall:redis_host') }}"
+kubernetes_monitoring_oncall_redis_password: "{{ lookup('hashi_vault', 'secret=secret/data/project-credentials/proxima/oncall:redis_password') }}"
+
