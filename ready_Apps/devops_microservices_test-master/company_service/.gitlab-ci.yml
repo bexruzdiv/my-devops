@@ -1,0 +1,50 @@
+variables:
+  IMAGE_NAME: bexruzdev/go
+  IMAGE_TAG: $CI_PIPELINE_IID
+
+stages:
+  - build
+  - deploy
+
+services:
+  - docker:dind
+
+
+job_build:
+  stage: build
+  tags:
+    - golang5
+  image: docker:dind
+
+  before_script:
+    - cat $KUBECONFIG
+    - whoami
+    - docker login --username "bexruzdev" --password "bexruzffakk"
+
+  script:
+    - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+    - docker push $IMAGE_NAME:$IMAGE_TAG
+    # - echo "hello"
+
+
+
+
+
+job_deploy:
+  stage: deploy
+  image: docker:dind
+
+  tags:
+    - golang5
+
+  before_script:
+    - apk --no-cache add curl
+    - curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+    - chmod +x kubectl
+    - mv kubectl /usr/local/bin/
+  script:
+    - mkdir  /root/.kube
+    - cat $KUBECONFIG > /root/.kube/config
+    - docker login --username "bexruzdev" --password "bexruzffakk"
+    - docker pull $IMAGE_NAME:$IMAGE_TAG
+    - kubectl set image deployment/company-service company-service=$IMAGE_NAME:$IMAGE_TAG

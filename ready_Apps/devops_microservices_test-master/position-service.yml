@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: position-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: position-service
+  template:
+    metadata:
+      labels:
+        app: position-service
+    spec:
+      containers:
+      - name: position-service
+        image: bexruzdev/service:v1
+        ports:
+        - containerPort: 5004
+        env:
+        - name: POSTGRES_HOST
+          value: udevs-postgres-service
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_DATABASE
+          value: udevs1
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: postgres
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: position-service
+spec:
+  selector:
+    app: position-service
+  ports:
+    - protocol: TCP
+      port: 5004
+      targetPort: 5004
+  type: ClusterIP
+

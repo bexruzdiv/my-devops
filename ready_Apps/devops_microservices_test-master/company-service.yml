@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: company-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: company-service
+  template:
+    metadata:
+      labels:
+        app: company-service
+    spec:
+      containers:
+      - name: company-service
+        image: bexruzdev/go:v6
+        ports:
+        - containerPort: 5005
+        env:
+        - name: POSTGRES_HOST
+          value: udevs-postgres-service
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_DATABASE
+          value: udevs
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: postgres
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: company-service
+spec:
+  selector:
+    app: company-service
+  ports:
+    - protocol: TCP
+      port: 5005
+      targetPort: 5005
+  type: ClusterIP
+
+
+

@@ -1,0 +1,17 @@
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Get IP addresses of cluster nodes
+      shell: "kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type==\"InternalIP\")].address}'"
+      register: cluster_ips
+
+    - name: Separate IP addresses
+      set_fact:
+        separated_ips: "{{ cluster_ips.stdout_lines | join(' ') }}"
+
+    - name: Generate Ansible Inventory
+      template:
+        src: inventory_template.ini.j2
+        dest: "inventory.ini"
+

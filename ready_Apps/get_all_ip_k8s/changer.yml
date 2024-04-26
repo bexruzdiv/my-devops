@@ -1,0 +1,14 @@
+---
+- hosts: servers
+  become: yes  # This allows Ansible to become sudo/root
+
+  tasks:
+    - name: Change ownership recursively for /opt/cni/bin
+      become_user: root
+      file:
+        path: /opt/cni/bin
+        recurse: yes
+        owner: root
+        group: root
+        mode: '0755'
+

@@ -1,0 +1,65 @@
+version: '3'
+networks:
+  my-network:
+    name: my-network
+    driver: bridge
+
+services:
+  postgres:
+    image: postgres
+    container_name: udevs
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - 5432:5432
+    networks:
+      - my-network
+    volumes:
+      - /home/bexruz/postgres-data:/var/lib/postgresql/data
+
+  company-service:
+    restart: always
+    depends_on:
+      - "postgres"
+    image: bexruzdev/go:v6
+    container_name: company-service
+    environment: 
+      POSTGRES_HOST: udevs
+      POSTGRES_PORT: 5432
+      POSTGRES_DATABASE: udevs
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    networks:
+      - my-network
+  api_geteway:
+    restart: always
+    image: bexruzdev/api_get:v1
+    container_name: api_geteway
+    networks:
+      - my-network
+    ports:
+      - 5004:8090
+    environment:
+      POSITION_SERVICE_HOST: position-service
+      POSITION_SERVICE_PORT: 5004
+      COMPANY_SERVICE_HOST: company-service
+      COMPANY_SERVICE_PORT: 5005
+
+  position-service:
+    restart: always
+    depends_on:
+      - "postgres"
+    image: bexruzdev/service:v1
+    container_name: position-service
+    environment:
+      POSTGRES_HOST: udevs
+      POSTGRES_PORT: 5432
+      POSTGRES_DATABASE: udevs2
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    networks:
+      - my-network
+
+
